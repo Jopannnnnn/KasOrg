@@ -1,5 +1,5 @@
 <?php
-// login.php
+// From login.php
 $page_title = "Masuk ke Akun - SakuOrg";
 ?>
 <!DOCTYPE html>
