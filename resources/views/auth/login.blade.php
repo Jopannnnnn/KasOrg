@@ -1,5 +1,7 @@
 @extends('layouts.guest', ['title' => 'Masuk ke Akun - KasOrg'])
 
+@php($isPreview = request()->routeIs('ui-preview.*'))
+
 @section('content')
     <main class="grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl md:grid-cols-2">
         <section class="relative flex flex-col justify-between overflow-hidden bg-brand-700 p-8 text-white sm:p-12">
@@ -47,26 +49,44 @@
                 <p class="mt-1 text-xs text-slate-500">Gunakan email dan kata sandi yang sudah terdaftar.</p>
             </div>
 
-            {{-- Preview visual saja: submit sengaja dihentikan sampai autentikasi Laravel diimplementasikan. --}}
-            <form class="space-y-5" onsubmit="return false">
+            @if ($isPreview)
+                <p class="mb-4 text-xs text-slate-500" role="note">Preview lokal: formulir ini tidak melakukan autentikasi.</p>
+            @endif
+
+            <form class="space-y-5" method="POST" action="{{ route($isPreview ? 'ui-preview.login' : 'login.store') }}" @if ($isPreview) onsubmit="return false" @endif>
+                @unless ($isPreview)
+                    @csrf
+                @endunless
                 <div>
                     <label for="email" class="mb-1.5 block text-xs font-bold text-slate-700">Alamat email</label>
-                    <input type="email" id="email" name="email" autocomplete="email" value="bendahara@organisasi.id" required
+                    <input type="email" id="email" name="email" autocomplete="email" value="{{ $isPreview ? 'bendahara@organisasi.id' : old('email') }}" placeholder="nama@organisasi.id" required
+                           @if (! $isPreview && $errors->has('email')) aria-invalid="true" aria-describedby="email-error" @endif
                            class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-600">
+                    @unless ($isPreview)
+                        @error('email')
+                            <p id="email-error" class="mt-1.5 text-xs text-red-600" role="alert">{{ $message }}</p>
+                        @enderror
+                    @endunless
                 </div>
 
                 <div>
                     <label for="password" class="mb-1.5 block text-xs font-bold text-slate-700">Kata sandi</label>
                     <div class="relative">
                         <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required
+                               @if (! $isPreview && $errors->has('password')) aria-invalid="true" aria-describedby="password-error" @endif
                                class="w-full rounded-xl border border-slate-200 px-4 py-3 pr-10 text-sm text-slate-800 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-600">
-                        <button type="button" id="toggle-password" aria-label="Tampilkan kata sandi" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                            <i data-lucide="eye" class="h-4 w-4"></i>
+                        <button type="button" id="toggle-password" aria-controls="password" aria-pressed="false" aria-label="Tampilkan kata sandi" class="absolute right-1 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg p-2 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-600">
+                            <i data-lucide="eye-off" class="h-4 w-4 shrink-0" aria-hidden="true"></i>
                         </button>
                     </div>
+                    @unless ($isPreview)
+                        @error('password')
+                            <p id="password-error" class="mt-1.5 text-xs text-red-600" role="alert">{{ $message }}</p>
+                        @enderror
+                    @endunless
                 </div>
 
-                <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-600/30 transition hover:bg-brand-700">
+                <button type="{{ $isPreview ? 'button' : 'submit' }}" class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-600/30 transition hover:bg-brand-700">
                     Masuk ke sistem <i data-lucide="chevron-right" class="h-4 w-4"></i>
                 </button>
             </form>
@@ -77,11 +97,25 @@
 
 @push('scripts')
     <script>
-        document.getElementById('toggle-password')?.addEventListener('click', (event) => {
+        (() => {
+            const button = document.getElementById('toggle-password');
             const input = document.getElementById('password');
-            const showPassword = input.type === 'password';
-            input.type = showPassword ? 'text' : 'password';
-            event.currentTarget.setAttribute('aria-label', showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
-        });
+            if (!button || !input) return;
+
+            button.addEventListener('click', () => {
+                const visible = input.type === 'password';
+                input.type = visible ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(visible));
+                button.setAttribute('aria-label', visible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+
+                const icon = document.createElement('i');
+                icon.dataset.lucide = visible ? 'eye' : 'eye-off';
+                icon.className = 'h-4 w-4 shrink-0';
+                icon.setAttribute('aria-hidden', 'true');
+                button.replaceChildren(icon);
+                // Listener tetap pada tombol; hanya SVG di dalamnya yang diganti.
+                window.lucide?.createIcons({ root: button });
+            });
+        })();
     </script>
 @endpush
