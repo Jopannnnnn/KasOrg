@@ -1,0 +1,13 @@
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="mb-4 flex items-center justify-between"><h3 class="text-base font-extrabold text-slate-900">Tagihan pribadi</h3><a href="{{ route('anggota.tagihan') }}" class="text-xs font-bold text-brand-600 hover:underline">Lihat semua tagihan</a></div>
+    <div class="overflow-x-auto"><table class="w-full text-left text-xs sm:text-sm"><thead><tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400"><th class="p-3">Jenis iuran</th><th class="p-3">Jatuh tempo</th><th class="p-3">Nominal</th><th class="p-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">
+        @forelse ($personalBills as $bill)<tr><td class="p-3 font-semibold">{{ $bill->jenisIuran->nama }}</td><td class="p-3">{{ $bill->jatuh_tempo?->format('d/m/Y') ?? 'Tidak ditentukan' }}</td><td class="p-3">{{ \App\Services\RingkasanKasService::rupiah($bill->nominal) }}</td><td class="p-3"><x-status-iuran :status="$bill->status" /></td></tr>@empty<tr><td colspan="4" class="p-6 text-center text-slate-500">Belum ada tagihan pribadi pada periode ini.</td></tr>@endforelse
+    </tbody></table></div>
+</section>
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h3 class="mb-4 text-base font-extrabold text-slate-900">Riwayat pembayaran pribadi</h3>
+    <div class="overflow-x-auto"><table class="w-full text-left text-xs sm:text-sm"><thead><tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400"><th class="p-3">Tanggal</th><th class="p-3">Tagihan</th><th class="p-3">Metode</th><th class="p-3">Nominal</th><th class="p-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">
+        @forelse ($personalPayments as $payment)<tr><td class="p-3">{{ $payment->tanggal_bayar->format('d/m/Y') }}</td><td class="p-3 font-semibold">{{ $payment->tagihanIuran->jenisIuran->nama }}@if ($payment->catatan)<p class="mt-2 text-xs font-normal text-slate-500">{{ $payment->catatan }}</p>@endif</td><td class="p-3">{{ ucfirst($payment->metode) }}</td><td class="p-3">{{ \App\Services\RingkasanKasService::rupiah($payment->nominal) }}</td><td class="p-3"><x-status-iuran :status="$payment->status" />@if ($payment->status === 'ditolak')<p class="mt-2 text-xs text-red-600">{{ $payment->alasan_penolakan }}</p>@endif</td></tr>@empty<tr><td colspan="5" class="p-6 text-center text-slate-500">Belum ada pembayaran pribadi pada periode ini.</td></tr>@endforelse
+    </tbody></table></div>
+    <p class="mt-4 text-xs text-slate-500">Sepuluh pengajuan terbaru. Riwayat lengkap tersedia pada detail Tagihan Saya.</p>
+</section>
