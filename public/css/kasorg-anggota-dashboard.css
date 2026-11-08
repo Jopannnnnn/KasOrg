@@ -1,0 +1,36 @@
+/* Anggota Dashboard only: preserve Refan's proportions without changing data or
+ * Bootstrap/legacy/admin/member-CRUD styles. Values are pre-migration layout sizes.
+ */
+.kasorg-bootstrap.ko-anggota-dashboard .ko-leading-tight { line-height:1.25 !important; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-portal-note { line-height:1rem; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-topbar { gap:0; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-topbar > div:last-child { flex-shrink:0; }
+.kasorg-bootstrap.ko-anggota-dashboard .shadow-sm { box-shadow:0 1px 2px #0000000d !important; }
+.kasorg-bootstrap.ko-anggota-dashboard main.ko-anggota-content > section.row {
+    margin-top:calc(2rem - var(--bs-gutter-y)) !important;
+}
+.kasorg-bootstrap.ko-anggota-dashboard .ko-period-filter .form-select {
+    appearance:auto; background-image:none; flex:0 1 auto;
+    padding-left:0; padding-right:0; line-height:17px !important;
+}
+.kasorg-bootstrap.ko-anggota-dashboard .ko-period-filter button { line-height:1rem; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-table thead tr { line-height:1rem !important; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-table > tbody > tr > td { border-bottom:0; vertical-align:middle; }
+.kasorg-bootstrap.ko-anggota-dashboard .ko-table > tbody > tr + tr { border-top:1px solid #f1f5f9; }
+@media(min-width:640px) {
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-table thead tr { line-height:20px !important; }
+}
+@media(max-width:639px) {
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-topbar { padding:1rem 1.5rem; }
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-topbar h1 { font-size:20px !important; }
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-anggota-stats > .col-sm-6 { width:100%; }
+}
+@media(min-width:992px) and (max-width:1023px) {
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-anggota-stats > .col-lg-3 { width:50%; }
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-anggota-panels > .col-lg-8,
+    .kasorg-bootstrap.ko-anggota-dashboard .ko-anggota-panels > .col-lg-4 { width:100%; }
+}
+
+
+.kasorg-bootstrap.ko-anggota-dashboard .ko-leading-relaxed { line-height:1.625 !important; }
+.kasorg-bootstrap.ko-anggota-dashboard .badge { white-space:normal; }
