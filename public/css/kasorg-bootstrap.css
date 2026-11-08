@@ -1,0 +1,282 @@
+/* KasOrg / Refan visual identity on top of Bootstrap 5.
+ * This file is also the no-build fallback. Never include it on legacy Tailwind pages.
+ * Backend values, chart datasets and authorization remain unchanged.
+ */
+.kasorg-bootstrap {
+    --bs-body-font-family: 'Plus Jakarta Sans', sans-serif;
+    --bs-body-color: #1e293b; --bs-body-bg: #f8fafc;
+    --bs-primary: #234578; --bs-primary-rgb: 35,69,120;
+    --bs-border-color: #e2e8f0; --bs-border-radius: .75rem;
+    font-family: var(--bs-body-font-family); color: var(--bs-body-color);
+    background: var(--bs-body-bg); font-size: 1rem; line-height: 1.5;
+}
+.kasorg-bootstrap h1, .kasorg-bootstrap h2, .kasorg-bootstrap h3,
+.kasorg-bootstrap p, .kasorg-bootstrap form { margin: 0; }
+.kasorg-bootstrap a { text-decoration: none; }
+.kasorg-bootstrap button, .kasorg-bootstrap input, .kasorg-bootstrap select,
+.kasorg-bootstrap textarea { font: inherit; }
+.kasorg-bootstrap svg { display:inline-block; vertical-align:middle; flex-shrink:0; }
+.kasorg-bootstrap fieldset { min-width:0; padding:0; border:0; }
+.kasorg-bootstrap .form-label { margin-bottom:0; }
+.kasorg-bootstrap .form-control, .kasorg-bootstrap .form-select {
+    border-color:#cbd5e1; border-radius:.75rem; line-height:1.5; background-color:white;
+}
+.kasorg-bootstrap .form-control:focus, .kasorg-bootstrap .form-select:focus {
+    border-color:#234578; box-shadow:0 0 0 .18rem #23457826;
+}
+.kasorg-bootstrap [aria-invalid="true"] { border-color:#dc2626; }
+.kasorg-bootstrap .form-control::placeholder { color:#94a3b8; opacity:1; }
+.kasorg-bootstrap .form-check-input { flex-shrink:0; }
+.kasorg-bootstrap .btn { --bs-btn-border-width:0; line-height:1.5; text-decoration:none; }
+.kasorg-bootstrap .btn:focus-visible { outline:2px solid #234578; outline-offset:2px; }
+.kasorg-bootstrap .ko-button { white-space:normal; }
+.kasorg-bootstrap .card { --bs-card-border-color:#e2e8f0; --bs-card-border-radius:1rem; min-width:0; }
+.kasorg-bootstrap .ko-table { margin:0; --bs-table-bg:transparent; --bs-table-color:inherit; }
+.kasorg-bootstrap .ko-table > :not(caption) > * > * { color:inherit; background:transparent; box-shadow:none; border-bottom-color:#f1f5f9; }
+.kasorg-bootstrap .table-responsive { max-width:100%; }
+.kasorg-bootstrap main, .kasorg-bootstrap .row > * { min-width:0; }
+.kasorg-bootstrap .ko-min-width-zero { min-width:0; }
+.kasorg-bootstrap .ko-font { font-family:'Plus Jakarta Sans',sans-serif; }
+.kasorg-bootstrap .ko-fw-heavy { font-weight:800; }
+.kasorg-bootstrap .ko-leading-tight { line-height:1.25; }
+.kasorg-bootstrap .ko-leading-snug { line-height:1.375; }
+.kasorg-bootstrap .ko-leading-relaxed { line-height:1.625; }
+.kasorg-bootstrap .ko-radius-small { border-radius:.5rem; }
+.kasorg-bootstrap .ko-radius-control { border-radius:.75rem; }
+.kasorg-bootstrap .ko-radius-card { border-radius:1rem; }
+.kasorg-bootstrap .ko-radius-login { border-radius:1.5rem; }
+.kasorg-bootstrap .ko-tracking-tight { letter-spacing:-.025em; }
+.kasorg-bootstrap .ko-tracking-wide { letter-spacing:.05em; }
+.kasorg-bootstrap .ko-transition { transition:color .15s,background-color .15s,box-shadow .15s; }
+.kasorg-bootstrap .ko-shadow-subtle { box-shadow:0 1px 2px #0000000d; }
+.kasorg-bootstrap .ko-shadow-panel { box-shadow:0 20px 25px -5px #0000001a; }
+.kasorg-bootstrap .ko-shadow-login { box-shadow:0 25px 50px -12px #00000040; }
+.kasorg-bootstrap .ko-border-collapse { border-collapse:collapse; }
+.kasorg-bootstrap .ko-blur { filter:blur(40px); }
+.kasorg-bootstrap .ko-inset { inset:0; }
+.kasorg-bootstrap .ko-z-topbar { z-index:30; }
+.kasorg-bootstrap .ko-z-modal { z-index:1055; }
+.kasorg-bootstrap .ko-portal-note { border-bottom:1px solid #dbeafe; background:#f0f4fa; padding:.5rem 1.5rem; font-size:.75rem; color:#172554; }
+.kasorg-bootstrap .ko-sidebar { width:100%; flex-shrink:0; }
+.kasorg-bootstrap .ko-sidebar .nav-link { border:0; text-align:left; }
+.kasorg-bootstrap .ko-topbar { flex-wrap:nowrap; gap:1rem; }
+.kasorg-bootstrap .ko-login-card { max-width:56rem; }
+.kasorg-bootstrap .ko-period-filter { max-width:100%; }
+.kasorg-bootstrap .ko-period-filter .form-select { width:auto; min-width:0; flex:1; }
+.kasorg-bootstrap main.ko-space-y-8 > section.row { margin-top:calc(2rem - var(--bs-gutter-y)) !important; }
+.kasorg-bootstrap.ko-guest { background:#f1f5f9; padding:1rem; }
+.kasorg-bootstrap .modal-content { border:0; border-radius:1rem; box-shadow:0 25px 50px -12px #00000040; }
+.kasorg-bootstrap .ko-member-dialog { --bs-modal-width:32rem; }
+.kasorg-bootstrap .ko-finance-dialog { --bs-modal-width:36rem; }
+.kasorg-bootstrap .modal-header, .kasorg-bootstrap .modal-body { padding:1.5rem; }
+.kasorg-bootstrap .modal form { overflow-y:auto; }
+.kasorg-bootstrap .pagination { --bs-pagination-color:#475569; --bs-pagination-active-bg:#234578; --bs-pagination-active-border-color:#234578; }
+@media(min-width:640px) { .kasorg-bootstrap.ko-guest { padding:1.5rem; } }
+@media(min-width:768px) { .kasorg-bootstrap .ko-sidebar { width:16rem; min-height:100vh; } }
+@media(max-width:639px) {
+    .kasorg-bootstrap .ko-topbar { padding:1rem; }
+    .kasorg-bootstrap .ko-topbar h1 { font-size:1.125rem; }
+}
+.kasorg-bootstrap .ko-grid { display:grid !important; }
+.kasorg-bootstrap .ko-max-w-4xl { max-width:56rem !important; }
+.kasorg-bootstrap .ko-grid-cols-1 { grid-template-columns:repeat(1,minmax(0,1fr)) !important; }
+.kasorg-bootstrap .ko-border-slate-100 { border-color:#f1f5f9 !important; }
+@media (min-width: 768px) { .kasorg-bootstrap .ko-md-grid-cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+.kasorg-bootstrap .ko-bg-brand-700 { background-color:#172554 !important; }
+.kasorg-bootstrap .ko-p-8 { padding:2rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-p-12 { padding:3rem !important; } }
+.kasorg-bootstrap .ko--right-16 { right:-4rem !important; }
+.kasorg-bootstrap .ko--top-16 { top:-4rem !important; }
+.kasorg-bootstrap .ko-h-64 { height:16rem !important; }
+.kasorg-bootstrap .ko-w-64 { width:16rem !important; }
+.kasorg-bootstrap .ko-bg-white-10 { background-color:rgba(255,255,255,0.1) !important; }
+.kasorg-bootstrap .ko-mb-10 { margin-bottom:2.5rem !important; }
+.kasorg-bootstrap .ko-gap-3 { gap:0.75rem !important; }
+.kasorg-bootstrap .ko-h-10 { height:2.5rem !important; }
+.kasorg-bootstrap .ko-w-10 { width:2.5rem !important; }
+.kasorg-bootstrap .ko-border-white-30 { border-color:rgba(255,255,255,0.3) !important; }
+.kasorg-bootstrap .ko-bg-white-20 { background-color:rgba(255,255,255,0.2) !important; }
+.kasorg-bootstrap .ko-h-5 { height:1.25rem !important; }
+.kasorg-bootstrap .ko-w-5 { width:1.25rem !important; }
+.kasorg-bootstrap .ko-text-lg { font-size:1.125rem !important; line-height:1.5 !important; }
+.kasorg-bootstrap .ko-text-xs { font-size:.75rem !important; line-height:1rem !important; }
+.kasorg-bootstrap .ko-text-blue-100 { color:#dbeafe !important; }
+.kasorg-bootstrap .ko-mb-4 { margin-bottom:1rem !important; }
+.kasorg-bootstrap .ko-px-3 { padding-left:0.75rem !important; padding-right:0.75rem !important; }
+.kasorg-bootstrap .ko-py-1 { padding-top:0.25rem !important; padding-bottom:0.25rem !important; }
+.kasorg-bootstrap .ko-text-blue-50 { color:#eff6ff !important; }
+.kasorg-bootstrap .ko-mb-3 { margin-bottom:0.75rem !important; }
+.kasorg-bootstrap .ko-text-2xl { font-size:1.5rem !important; line-height:2rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-text-3xl { font-size:1.875rem !important; line-height:2.25rem !important; } }
+.kasorg-bootstrap .ko-text-sm { font-size:.875rem !important; line-height:1.25rem !important; }
+.kasorg-bootstrap .ko-mt-8 { margin-top:2rem !important; }
+.kasorg-bootstrap .ko-mb-8 { margin-bottom:2rem !important; }
+.kasorg-bootstrap .ko-grid-cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+.kasorg-bootstrap .ko-border-white-15 { border-color:rgba(255,255,255,0.15) !important; }
+.kasorg-bootstrap .ko-p-3 { padding:0.75rem !important; }
+.kasorg-bootstrap .ko-text-xl { font-size:1.25rem !important; line-height:1.5 !important; }
+.kasorg-bootstrap .ko-text--11px- { font-size:11px !important; line-height:1.5 !important; }
+.kasorg-bootstrap .ko-text-blue-200 { color:#bfdbfe !important; }
+.kasorg-bootstrap .ko-text-brand-600 { color:#234578 !important; }
+.kasorg-bootstrap .ko-mt-1 { margin-top:0.25rem !important; }
+.kasorg-bootstrap .ko-text-slate-900 { color:#0f172a !important; }
+.kasorg-bootstrap .ko-text-slate-500 { color:#64748b !important; }
+.kasorg-bootstrap .ko-space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top:1.25rem !important; }
+.kasorg-bootstrap .ko-mb-1-5 { margin-bottom:0.375rem !important; }
+.kasorg-bootstrap .ko-text-slate-700 { color:#334155 !important; }
+.kasorg-bootstrap .ko-border-slate-200 { border-color:#e2e8f0 !important; }
+.kasorg-bootstrap .ko-px-4 { padding-left:1rem !important; padding-right:1rem !important; }
+.kasorg-bootstrap .ko-py-3 { padding-top:0.75rem !important; padding-bottom:0.75rem !important; }
+.kasorg-bootstrap .ko-text-slate-800 { color:#1e293b !important; }
+.kasorg-bootstrap .ko-placeholder-slate-400::placeholder { color:#94a3b8 !important; }
+.kasorg-bootstrap .ko-focus-border-transparent:focus { border-color:transparent !important; }
+.kasorg-bootstrap .ko-focus-outline-none:focus { outline:none !important; }
+.kasorg-bootstrap .ko-focus-ring-2:focus { outline:2px solid #234578 !important; outline-offset:2px !important; }
+.kasorg-bootstrap .ko-focus-ring-brand-600:focus { outline-color:#234578 !important; }
+.kasorg-bootstrap .ko-mt-1-5 { margin-top:0.375rem !important; }
+.kasorg-bootstrap .ko-text-red-600 { color:#dc2626 !important; }
+.kasorg-bootstrap .ko-pr-10 { padding-right:2.5rem !important; }
+.kasorg-bootstrap .ko-right-1 { right:0.25rem !important; }
+.kasorg-bootstrap .ko-h-8 { height:2rem !important; }
+.kasorg-bootstrap .ko-w-8 { width:2rem !important; }
+.kasorg-bootstrap .ko-p-2 { padding:0.5rem !important; }
+.kasorg-bootstrap .ko-text-slate-400 { color:#94a3b8 !important; }
+.kasorg-bootstrap .ko-hover-text-slate-600:hover { color:#475569 !important; }
+.kasorg-bootstrap .ko-h-4 { height:1rem !important; }
+.kasorg-bootstrap .ko-w-4 { width:1rem !important; }
+.kasorg-bootstrap .ko-gap-2 { gap:0.5rem !important; }
+.kasorg-bootstrap .ko-bg-brand-600 { background-color:#234578 !important; }
+.kasorg-bootstrap .ko-py-3-5 { padding-top:0.875rem !important; padding-bottom:0.875rem !important; }
+.kasorg-bootstrap .ko-shadow-brand-600-30 { --bs-box-shadow:0 4px 8px #23457833 !important; }
+.kasorg-bootstrap .ko-hover-bg-brand-700:hover { background-color:#172554 !important; }
+.kasorg-bootstrap .ko-space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top:2rem !important; }
+.kasorg-bootstrap .ko-p-6 { padding:1.5rem !important; }
+@media (min-width: 768px) { .kasorg-bootstrap .ko-md-p-8 { padding:2rem !important; } }
+.kasorg-bootstrap .ko-gap-4 { gap:1rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-flex-row { flex-direction:row !important; } }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-items-center { align-items:center !important; } }
+.kasorg-bootstrap .ko-mt-0-5 { margin-top:0.125rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-text-sm { font-size:.875rem !important; line-height:1.25rem !important; } }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-grid-cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+@media (min-width: 1024px) { .kasorg-bootstrap .ko-lg-grid-cols-4 { grid-template-columns:repeat(4,minmax(0,1fr)) !important; } }
+.kasorg-bootstrap .ko-p-5 { padding:1.25rem !important; }
+.kasorg-bootstrap .ko-bg-blue-50 { background-color:#eff6ff !important; }
+.kasorg-bootstrap .ko-mt-2 { margin-top:0.5rem !important; }
+.kasorg-bootstrap .ko-bg-emerald-50 { background-color:#ecfdf5 !important; }
+.kasorg-bootstrap .ko-text-emerald-600 { color:#059669 !important; }
+.kasorg-bootstrap .ko-bg-rose-50 { background-color:#fff1f2 !important; }
+.kasorg-bootstrap .ko-text-rose-600 { color:#e11d48 !important; }
+.kasorg-bootstrap .ko-bg-purple-50 { background-color:#faf5ff !important; }
+.kasorg-bootstrap .ko-text-purple-600 { color:#9333ea !important; }
+.kasorg-bootstrap .ko-gap-6 { gap:1.5rem !important; }
+@media (min-width: 1024px) { .kasorg-bootstrap .ko-lg-grid-cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+@media (min-width: 1024px) { .kasorg-bootstrap .ko-lg-col-span-2 { grid-column:span 2 !important; } }
+.kasorg-bootstrap .ko-mb-6 { margin-bottom:1.5rem !important; }
+.kasorg-bootstrap .ko-text-base { font-size:1rem !important; line-height:1.5 !important; }
+.kasorg-bootstrap .ko-gap-1-5 { gap:0.375rem !important; }
+.kasorg-bootstrap .ko-h-2-5 { height:0.625rem !important; }
+.kasorg-bootstrap .ko-w-2-5 { width:0.625rem !important; }
+.kasorg-bootstrap .ko-bg-blue-100 { background-color:#dbeafe !important; }
+.kasorg-bootstrap .ko-mb-5 { margin-bottom:1.25rem !important; }
+.kasorg-bootstrap .ko-space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top:0.75rem !important; }
+.kasorg-bootstrap .ko-bg-slate-50 { background-color:#f8fafc !important; }
+.kasorg-bootstrap .ko-p-4 { padding:1rem !important; }
+.kasorg-bootstrap .ko-hover-underline:hover { text-decoration:underline !important; }
+.kasorg-bootstrap .ko-mt-6 { margin-top:1.5rem !important; }
+.kasorg-bootstrap .ko-bg-brand-50 { background-color:#F0F4FA !important; }
+.kasorg-bootstrap .ko-text-brand-700 { color:#172554 !important; }
+.kasorg-bootstrap .ko-hover-bg-brand-100:hover { background-color:#DBE5F3 !important; }
+.kasorg-bootstrap .ko-h-3-5 { height:0.875rem !important; }
+.kasorg-bootstrap .ko-w-3-5 { width:0.875rem !important; }
+.kasorg-bootstrap .ko-gap-1 { gap:0.25rem !important; }
+.kasorg-bootstrap .ko-px-2-5 { padding-left:0.625rem !important; padding-right:0.625rem !important; }
+.kasorg-bootstrap .ko-py-8 { padding-top:2rem !important; padding-bottom:2rem !important; }
+.kasorg-bootstrap .ko-bg-amber-50 { background-color:#fffbeb !important; }
+.kasorg-bootstrap .ko-text-amber-600 { color:#d97706 !important; }
+.kasorg-bootstrap .ko-border-amber-200-60 { border-color:rgba(253,230,138,0.6) !important; }
+.kasorg-bootstrap .ko-bg-amber-50-50 { background-color:rgba(255,251,235,0.5) !important; }
+.kasorg-bootstrap .ko-bg-amber-100 { background-color:#fef3c7 !important; }
+.kasorg-bootstrap .ko-text-amber-700 { color:#b45309 !important; }
+.kasorg-bootstrap .ko-text-slate-600 { color:#475569 !important; }
+.kasorg-bootstrap .ko-mt-4 { margin-top:1rem !important; }
+.kasorg-bootstrap .ko-border-amber-200-50 { border-color:rgba(253,230,138,0.5) !important; }
+.kasorg-bootstrap .ko-bg-white-80 { background-color:rgba(255,255,255,0.8) !important; }
+.kasorg-bootstrap .ko-pt-4 { padding-top:1rem !important; }
+.kasorg-bootstrap .ko-text-amber-800 { color:#92400e !important; }
+.kasorg-bootstrap .ko-py-2-5 { padding-top:0.625rem !important; padding-bottom:0.625rem !important; }
+.kasorg-bootstrap .ko-shadow-brand-600-20 { --bs-box-shadow:0 4px 8px #23457833 !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-self-auto { align-self:auto !important; } }
+.kasorg-bootstrap .ko-border-blue-100 { border-color:#dbeafe !important; }
+.kasorg-bootstrap .ko-border-red-200 { border-color:#fecaca !important; }
+.kasorg-bootstrap .ko-bg-red-50 { background-color:#fef2f2 !important; }
+.kasorg-bootstrap .ko-text-red-700 { color:#b91c1c !important; }
+.kasorg-bootstrap .ko-list-inside { list-style-position:inside !important; }
+.kasorg-bootstrap .ko-list-disc { list-style-type:disc !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-grid-cols-3 { grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-p-5 { padding:1.25rem !important; } }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-w-80 { width:20rem !important; } }
+.kasorg-bootstrap .ko-left-3-5 { left:0.875rem !important; }
+.kasorg-bootstrap .ko-pl-10 { padding-left:2.5rem !important; }
+.kasorg-bootstrap .ko-pr-4 { padding-right:1rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-w-auto { width:auto !important; } }
+.kasorg-bootstrap .ko-px-3-5 { padding-left:0.875rem !important; padding-right:0.875rem !important; }
+.kasorg-bootstrap .ko-hover-bg-slate-50:hover { background-color:#f8fafc !important; }
+.kasorg-bootstrap .ko-py-2 { padding-top:0.5rem !important; padding-bottom:0.5rem !important; }
+.kasorg-bootstrap .ko-bg-slate-50-70 { background-color:rgba(248,250,252,0.7) !important; }
+.kasorg-bootstrap .ko-hover-bg-slate-50-80:hover { background-color:rgba(248,250,252,0.8) !important; }
+.kasorg-bootstrap .ko-py-4 { padding-top:1rem !important; padding-bottom:1rem !important; }
+.kasorg-bootstrap .ko-bg-slate-100 { background-color:#f1f5f9 !important; }
+.kasorg-bootstrap .ko-hover-text-brand-600:hover { color:#234578 !important; }
+.kasorg-bootstrap .ko-hover-text-rose-600:hover { color:#e11d48 !important; }
+.kasorg-bootstrap .ko-py-10 { padding-top:2.5rem !important; padding-bottom:2.5rem !important; }
+.kasorg-bootstrap .ko-bg-slate-900-50 { background-color:rgba(15,23,42,0.5) !important; }
+.kasorg-bootstrap .ko-max-w-lg { max-width:32rem !important; }
+.kasorg-bootstrap .ko-px-6 { padding-left:1.5rem !important; padding-right:1.5rem !important; }
+.kasorg-bootstrap .ko-py-5 { padding-top:1.25rem !important; padding-bottom:1.25rem !important; }
+.kasorg-bootstrap .ko-space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top:1rem !important; }
+.kasorg-bootstrap .ko-border-slate-300 { border-color:#cbd5e1 !important; }
+.kasorg-bootstrap .ko-focus-ring-brand-100:focus { outline-color:#DBE5F3 !important; }
+.kasorg-bootstrap .ko-pl-4 { padding-left:1rem !important; }
+.kasorg-bootstrap .ko-pr-12 { padding-right:3rem !important; }
+.kasorg-bootstrap .ko-right-2 { right:0.5rem !important; }
+.kasorg-bootstrap .ko-border-transparent { border-color:transparent !important; }
+.kasorg-bootstrap .ko-pt-2 { padding-top:0.5rem !important; }
+.kasorg-bootstrap .ko-px-5 { padding-left:1.25rem !important; padding-right:1.25rem !important; }
+.kasorg-bootstrap .ko-max-w-xs { max-width:20rem !important; }
+.kasorg-bootstrap .ko-text-emerald-700 { color:#047857 !important; }
+.kasorg-bootstrap .ko-bg-red-600 { background-color:#dc2626 !important; }
+.kasorg-bootstrap .ko-disabled-cursor-wait:disabled { cursor:wait !important; }
+.kasorg-bootstrap .ko-disabled-opacity-60:disabled { opacity:.6 !important; }
+.kasorg-bootstrap .ko-max-w-md { max-width:28rem !important; }
+.kasorg-bootstrap .ko-mt-3 { margin-top:0.75rem !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-p-8 { padding:2rem !important; } }
+.kasorg-bootstrap .ko-focus-visible-outline:focus-visible { outline-style:solid !important; }
+.kasorg-bootstrap .ko-focus-visible-outline-2:focus-visible { outline-width:2px !important; }
+.kasorg-bootstrap .ko-focus-visible-outline-offset-2:focus-visible { outline-offset:2px !important; }
+.kasorg-bootstrap .ko-focus-visible-outline-brand-600:focus-visible { outline-color:#234578 !important; }
+.kasorg-bootstrap .ko-h-56 { height:14rem !important; }
+.kasorg-bootstrap .ko-px-2 { padding-left:0.5rem !important; padding-right:0.5rem !important; }
+.kasorg-bootstrap .ko-max-w--42px- { max-width:42px !important; }
+.kasorg-bootstrap .ko-rounded-t-md { border-radius:.375rem .375rem 0 0 !important; }
+.kasorg-bootstrap .ko-text--10px- { font-size:10px !important; line-height:1.5 !important; }
+.kasorg-bootstrap .ko-py-1-5 { padding-top:0.375rem !important; padding-bottom:0.375rem !important; }
+@media (min-width: 768px) { .kasorg-bootstrap .ko-md-min-h-screen { min-height:100vh !important; } }
+@media (min-width: 768px) { .kasorg-bootstrap .ko-md-w-64 { width:16rem !important; } }
+.kasorg-bootstrap .ko-border-white-20 { border-color:rgba(255,255,255,0.2) !important; }
+.kasorg-bootstrap .ko-shadow-inner { box-shadow:inset 0 2px 4px #0000000d !important; }
+.kasorg-bootstrap .ko-mb-2 { margin-bottom:0.5rem !important; }
+.kasorg-bootstrap .ko-text-blue-200-70 { color:rgba(191,219,254,0.7) !important; }
+.kasorg-bootstrap .ko-space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top:0.25rem !important; }
+.kasorg-bootstrap .ko-hover-bg-white-10:hover { background-color:rgba(255,255,255,0.1) !important; }
+.kasorg-bootstrap .ko-py-0-5 { padding-top:0.125rem !important; padding-bottom:0.125rem !important; }
+.kasorg-bootstrap .ko-pt-6 { padding-top:1.5rem !important; }
+.kasorg-bootstrap .ko-top-2 { top:0.5rem !important; }
+.kasorg-bootstrap .ko-h-2 { height:0.5rem !important; }
+.kasorg-bootstrap .ko-w-2 { width:0.5rem !important; }
+.kasorg-bootstrap .ko-bg-rose-500 { background-color:#f43f5e !important; }
+.kasorg-bootstrap .ko-ring-2 { outline:2px solid #234578 !important; outline-offset:2px !important; }
+.kasorg-bootstrap .ko-ring-white { outline-color:white !important; }
+.kasorg-bootstrap .ko-pl-2 { padding-left:0.5rem !important; }
+.kasorg-bootstrap .ko-border-blue-200 { border-color:#bfdbfe !important; }
+@media (min-width: 640px) { .kasorg-bootstrap .ko-sm-block { display:block !important; } }
+.kasorg-bootstrap .ko-my-4 { margin-top:1rem !important; margin-bottom:1rem !important; }
