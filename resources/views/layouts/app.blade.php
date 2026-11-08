@@ -1,3 +1,15 @@
+@php
+    $isPreview = request()->routeIs('ui-preview.*');
+    if (! $isPreview) {
+        // Identitas aplikasi dari session, bukan nama contoh yang disediakan view.
+        $account = auth()->user();
+        $role = $account->role->kode;
+        $userName = $account->name;
+        $userInitials = \Illuminate\Support\Str::of($userName)->explode(' ')
+            ->filter()->take(2)->map(fn ($part) => mb_substr($part, 0, 1))->implode('');
+        $userInitials = mb_strtoupper($userInitials);
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>

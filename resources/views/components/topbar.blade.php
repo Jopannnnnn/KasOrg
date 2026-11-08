@@ -24,7 +24,7 @@
             </div>
             <div class="hidden text-left sm:block">
                 <p class="text-sm font-bold leading-tight text-slate-800">{{ $userName }}</p>
-                <p class="text-xs text-slate-500">{{ $role === 'admin' ? 'Bendahara' : 'Anggota' }}</p>
+                <p class="text-xs text-slate-500">{{ $role === 'admin' ? 'Admin' : 'Anggota' }}</p>
             </div>
         </div>
     </div>

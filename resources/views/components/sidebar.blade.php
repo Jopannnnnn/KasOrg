@@ -1,21 +1,23 @@
 @props(['role' => 'anggota'])
 
 @php
+    $isPreview = request()->routeIs('ui-preview.*');
+    $routePrefix = $isPreview ? 'ui-preview.' : '';
     $adminItems = [
-        ['label' => 'Dashboard', 'icon' => 'layout-grid', 'route' => 'ui-preview.admin.dashboard'],
-        ['label' => 'Data Anggota', 'icon' => 'users', 'route' => 'ui-preview.admin.anggota'],
-        ['label' => 'Input Iuran', 'icon' => 'banknote', 'route' => 'ui-preview.admin.iuran'],
-        ['label' => 'Verifikasi Pembayaran', 'icon' => 'check-circle-2', 'route' => 'ui-preview.admin.verifikasi', 'badge' => '2', 'badgeClass' => 'bg-red-500 text-white'],
-        ['label' => 'Transaksi Kas', 'icon' => 'credit-card', 'route' => 'ui-preview.admin.transaksi'],
-        ['label' => 'Laporan', 'icon' => 'file-text', 'route' => 'ui-preview.admin.laporan'],
-        ['label' => 'Transparansi Kas', 'icon' => 'eye', 'route' => 'ui-preview.admin.transparansi'],
+        ['label' => 'Dashboard', 'icon' => 'layout-grid', 'route' => 'admin.dashboard'],
+        ['label' => 'Data Anggota', 'icon' => 'users', 'route' => 'admin.anggota'],
+        ['label' => 'Input Iuran', 'icon' => 'banknote', 'route' => 'admin.iuran'],
+        ['label' => 'Verifikasi Pembayaran', 'icon' => 'check-circle-2', 'route' => 'admin.verifikasi', 'badge' => '2', 'badgeClass' => 'bg-red-500 text-white'],
+        ['label' => 'Transaksi Kas', 'icon' => 'credit-card', 'route' => 'admin.transaksi'],
+        ['label' => 'Laporan', 'icon' => 'file-text', 'route' => 'admin.laporan'],
+        ['label' => 'Transparansi Kas', 'icon' => 'eye', 'route' => 'admin.transparansi'],
     ];
 
     $anggotaItems = [
-        ['label' => 'Dashboard', 'icon' => 'layout-grid', 'route' => 'ui-preview.anggota.dashboard'],
-        ['label' => 'Tagihan', 'icon' => 'receipt-text', 'route' => 'ui-preview.anggota.tagihan', 'badge' => '2', 'badgeClass' => 'bg-white/20 text-white'],
-        ['label' => 'Laporan', 'icon' => 'file-text', 'route' => 'ui-preview.anggota.laporan'],
-        ['label' => 'Transparansi Kas', 'icon' => 'eye', 'route' => 'ui-preview.anggota.transparansi'],
+        ['label' => 'Dashboard', 'icon' => 'layout-grid', 'route' => 'anggota.dashboard'],
+        ['label' => 'Tagihan', 'icon' => 'receipt-text', 'route' => 'anggota.tagihan', 'badge' => '2', 'badgeClass' => 'bg-white/20 text-white'],
+        ['label' => 'Laporan', 'icon' => 'file-text', 'route' => 'anggota.laporan'],
+        ['label' => 'Transparansi Kas', 'icon' => 'eye', 'route' => 'anggota.transparansi'],
     ];
 
     $items = $role === 'admin' ? $adminItems : $anggotaItems;
@@ -34,10 +36,10 @@
         </div>
 
         <div class="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-blue-200/70">Menu Utama</div>
-        <nav class="space-y-1" aria-label="Navigasi preview {{ $role }}">
+        <nav class="space-y-1" aria-label="Navigasi {{ $isPreview ? 'preview ' : '' }}{{ $role }}">
             @foreach ($items as $item)
-                <a href="{{ route($item['route']) }}"
-                   class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {{ request()->routeIs($item['route']) || ($role === 'admin' && request()->is('/')) ? 'bg-white text-brand-700 shadow-sm' : 'text-blue-100 hover:bg-white/10' }}">
+                <a href="{{ route($routePrefix.$item['route']) }}"
+                   class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {{ (request()->routeIs($routePrefix.$item['route']) || (! $isPreview && $item['route'] === 'admin.iuran' && request()->routeIs('admin.iuran.jenis.*'))) ? 'bg-white text-brand-700 shadow-sm' : 'text-blue-100 hover:bg-white/10' }}">
                     <i data-lucide="{{ $item['icon'] }}" class="h-4 w-4"></i>
                     <span>{{ $item['label'] }}</span>
                     @isset($item['badge'])
@@ -49,8 +51,17 @@
     </div>
 
     <div class="border-t border-white/15 pt-6">
-        <a href="{{ route('ui-preview.login') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-blue-100 transition hover:bg-white/10">
-            <i data-lucide="log-out" class="h-4 w-4"></i> Keluar
-        </a>
+        @if ($isPreview)
+            <a href="{{ route('ui-preview.login') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-blue-100 transition hover:bg-white/10">
+                <i data-lucide="log-out" class="h-4 w-4"></i> Keluar
+            </a>
+        @else
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-blue-100 transition hover:bg-white/10">
+                    <i data-lucide="log-out" class="h-4 w-4"></i> Keluar
+                </button>
+            </form>
+        @endif
     </div>
 </aside>
