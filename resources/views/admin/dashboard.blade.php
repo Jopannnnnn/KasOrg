@@ -4,115 +4,119 @@
     'role' => 'admin',
 ])
 
+@section('body-class', 'ko-admin-dashboard')
+@push('styles')
+    <link href="{{ asset('css/kasorg-admin-dashboard.css') }}" rel="stylesheet">
+@endpush
 
 @section('content')
-    <main class="flex-1 space-y-8 overflow-y-auto p-6 md:p-8">
-        <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <main class="ko-admin-content flex-grow-1 ko-space-y-8 overflow-y-auto ko-p-6 ko-md-p-8">
+        <div class="d-flex flex-column justify-content-between ko-gap-4 ko-sm-flex-row ko-sm-items-center">
             <div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Selamat datang, {{ auth()->user()->name }}!</h2>
-                <p class="mt-0.5 text-xs text-slate-500 sm:text-sm">Berikut ringkasan kondisi keuangan organisasi pada periode terpilih.</p>
+                <h2 class="ko-text-2xl ko-fw-heavy ko-tracking-tight ko-text-slate-900">Selamat datang, {{ auth()->user()->name }}!</h2>
+                <p class="ko-mt-0-5 ko-text-xs ko-text-slate-500 ko-sm-text-sm">Berikut ringkasan kondisi keuangan organisasi pada periode terpilih.</p>
             </div>
-            @include('keuangan.periode-filter')
+            @include('bootstrap.keuangan.periode-filter')
         </div>
-        <x-keuangan-feedback />
+        <x-bootstrap.feedback />
 
-        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Ringkasan keuangan">
-            <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="mb-3 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-500">Total saldo kas</span>
-                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-brand-600"><i data-lucide="wallet" class="h-4 w-4"></i></span>
+        <section class="ko-admin-stats row g-3" aria-label="Ringkasan keuangan">
+            <div class="col-12 col-sm-6 col-lg-3"><article class="card h-100 position-relative overflow-hidden ko-radius-card border ko-border-slate-200 bg-white ko-p-5 shadow-sm">
+                <div class="ko-mb-3 d-flex align-items-center justify-content-between">
+                    <span class="ko-text-xs fw-semibold ko-text-slate-500">Total saldo kas</span>
+                    <span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-control ko-bg-blue-50 ko-text-brand-600"><i data-lucide="wallet" class="ko-h-4 ko-w-4"></i></span>
                 </div>
-                <p class="text-2xl font-extrabold text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['closing']) }}</p>
-                <p class="mt-2 text-xs font-medium text-slate-400">Berdasarkan data database</p>
-            </article>
-            <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="mb-3 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-500">Pemasukan periode ini</span>
-                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="arrow-down-left" class="h-4 w-4"></i></span>
+                <p class="ko-text-2xl ko-fw-heavy ko-text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['closing']) }}</p>
+                <p class="ko-mt-2 ko-text-xs fw-medium ko-text-slate-400">Berdasarkan data database</p>
+            </article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="card h-100 position-relative overflow-hidden ko-radius-card border ko-border-slate-200 bg-white ko-p-5 shadow-sm">
+                <div class="ko-mb-3 d-flex align-items-center justify-content-between">
+                    <span class="ko-text-xs fw-semibold ko-text-slate-500">Pemasukan periode ini</span>
+                    <span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-control ko-bg-emerald-50 ko-text-emerald-600"><i data-lucide="arrow-down-left" class="ko-h-4 ko-w-4"></i></span>
                 </div>
-                <p class="text-2xl font-extrabold text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['income']) }}</p>
-                <p class="mt-2 text-xs font-medium text-slate-400">Berdasarkan data database</p>
-            </article>
-            <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="mb-3 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-500">Pengeluaran periode ini</span>
-                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><i data-lucide="arrow-up-right" class="h-4 w-4"></i></span>
+                <p class="ko-text-2xl ko-fw-heavy ko-text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['income']) }}</p>
+                <p class="ko-mt-2 ko-text-xs fw-medium ko-text-slate-400">Berdasarkan data database</p>
+            </article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="card h-100 position-relative overflow-hidden ko-radius-card border ko-border-slate-200 bg-white ko-p-5 shadow-sm">
+                <div class="ko-mb-3 d-flex align-items-center justify-content-between">
+                    <span class="ko-text-xs fw-semibold ko-text-slate-500">Pengeluaran periode ini</span>
+                    <span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-control ko-bg-rose-50 ko-text-rose-600"><i data-lucide="arrow-up-right" class="ko-h-4 ko-w-4"></i></span>
                 </div>
-                <p class="text-2xl font-extrabold text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['expense']) }}</p>
-                <p class="mt-2 text-xs font-medium text-slate-400">Berdasarkan data database</p>
-            </article>
-            <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div class="mb-3 flex items-center justify-between">
-                    <span class="text-xs font-semibold text-slate-500">Total anggota aktif</span>
-                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600"><i data-lucide="users" class="h-4 w-4"></i></span>
+                <p class="ko-text-2xl ko-fw-heavy ko-text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary['expense']) }}</p>
+                <p class="ko-mt-2 ko-text-xs fw-medium ko-text-slate-400">Berdasarkan data database</p>
+            </article></div>
+            <div class="col-12 col-sm-6 col-lg-3"><article class="card h-100 position-relative overflow-hidden ko-radius-card border ko-border-slate-200 bg-white ko-p-5 shadow-sm">
+                <div class="ko-mb-3 d-flex align-items-center justify-content-between">
+                    <span class="ko-text-xs fw-semibold ko-text-slate-500">Total anggota aktif</span>
+                    <span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-control ko-bg-purple-50 ko-text-purple-600"><i data-lucide="users" class="ko-h-4 ko-w-4"></i></span>
                 </div>
-                <p class="text-2xl font-extrabold text-slate-900">{{ $activeMembers }} anggota</p>
-                <p class="mt-2 text-xs font-medium text-slate-400">Berdasarkan data database</p>
-            </article>
+                <p class="ko-text-2xl ko-fw-heavy ko-text-slate-900">{{ $activeMembers }} anggota</p>
+                <p class="ko-mt-2 ko-text-xs fw-medium ko-text-slate-400">Berdasarkan data database</p>
+            </article></div>
         </section>
 
-        <section class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
-                <div class="mb-6 flex items-center justify-between">
+        <section class="ko-admin-panels row g-4">
+            <div class="col-12 col-lg-8"><article class="card h-100 ko-radius-card border ko-border-slate-200 bg-white ko-p-6 shadow-sm ">
+                <div class="ko-mb-6 d-flex align-items-center justify-content-between">
                     <div>
-                        <h3 class="text-base font-extrabold text-slate-900">Arus kas organisasi</h3>
-                        <p class="text-xs text-slate-500">Perbandingan pemasukan dan pengeluaran</p>
+                        <h3 class="ko-text-base ko-fw-heavy ko-text-slate-900">Arus kas organisasi</h3>
+                        <p class="ko-text-xs ko-text-slate-500">Perbandingan pemasukan dan pengeluaran</p>
                     </div>
-                    <div class="flex items-center gap-4 text-xs font-bold">
-                        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-brand-600"></span>Pemasukan</span>
-                        <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-blue-100"></span>Pengeluaran</span>
+                    <div class="d-flex align-items-center ko-gap-4 ko-text-xs fw-bold">
+                        <span class="d-flex align-items-center ko-gap-1-5"><span class="ko-h-2-5 ko-w-2-5 rounded-pill ko-bg-brand-600"></span>Pemasukan</span>
+                        <span class="d-flex align-items-center ko-gap-1-5"><span class="ko-h-2-5 ko-w-2-5 rounded-pill ko-bg-blue-100"></span>Pengeluaran</span>
                     </div>
                 </div>
-                @include('keuangan.arus-kas')
-            </article>
+                @include('bootstrap.keuangan.arus-kas')
+            </article></div>
 
-            <article class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="col-12 col-lg-4"><article class="card h-100 d-flex flex-column justify-content-between ko-radius-card border ko-border-slate-200 bg-white ko-p-6 shadow-sm">
                 <div>
-                    <h3 class="text-base font-extrabold text-slate-900">Perlu perhatian</h3>
-                    <p class="mb-5 text-xs text-slate-500">Tagihan berdasarkan periode terpilih</p>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4">
-                            <div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-sm font-extrabold text-brand-600">{{ $billStats['unpaid'] }}</span><span class="text-xs font-bold text-slate-700">Tagihan belum lunas</span></div>
-                            <i data-lucide="clock" class="h-4 w-4 text-slate-400"></i>
+                    <h3 class="ko-text-base ko-fw-heavy ko-text-slate-900">Perlu perhatian</h3>
+                    <p class="ko-mb-5 ko-text-xs ko-text-slate-500">Tagihan berdasarkan periode terpilih</p>
+                    <div class="ko-space-y-3">
+                        <div class="d-flex align-items-center justify-content-between ko-radius-control border ko-border-slate-100 ko-bg-slate-50 ko-p-4">
+                            <div class="d-flex align-items-center ko-gap-3"><span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-small ko-bg-blue-100 ko-text-sm ko-fw-heavy ko-text-brand-600">{{ $billStats['unpaid'] }}</span><span class="ko-text-xs fw-bold ko-text-slate-700">Tagihan belum lunas</span></div>
+                            <i data-lucide="clock" class="ko-h-4 ko-w-4 ko-text-slate-400"></i>
                         </div>
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4">
-                            <div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-sm font-extrabold text-brand-600">{{ $billStats['waiting'] }}</span><a href="{{ route('admin.verifikasi') }}" class="text-xs font-bold text-slate-700 hover:underline">Pembayaran menunggu</a></div>
-                            <i data-lucide="file-check" class="h-4 w-4 text-slate-400"></i>
+                        <div class="d-flex align-items-center justify-content-between ko-radius-control border ko-border-slate-100 ko-bg-slate-50 ko-p-4">
+                            <div class="d-flex align-items-center ko-gap-3"><span class="d-flex ko-h-8 ko-w-8 align-items-center justify-content-center ko-radius-small ko-bg-blue-100 ko-text-sm ko-fw-heavy ko-text-brand-600">{{ $billStats['waiting'] }}</span><a href="{{ route('admin.verifikasi') }}" class="ko-text-xs fw-bold ko-text-slate-700 ko-hover-underline">Pembayaran menunggu</a></div>
+                            <i data-lucide="file-check" class="ko-h-4 ko-w-4 ko-text-slate-400"></i>
                         </div>
                     </div>
                 </div>
-                <a href="{{ route((request()->routeIs('ui-preview.*') ? 'ui-preview.' : '').'admin.iuran') }}" class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-50 py-3 text-xs font-bold text-brand-700 transition hover:bg-brand-100">
-                    Kelola Tagihan Anggota <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+                <a href="{{ route((request()->routeIs('ui-preview.*') ? 'ui-preview.' : '').'admin.iuran') }}" class="ko-mt-6 d-flex w-100 align-items-center justify-content-center ko-gap-2 ko-radius-control ko-bg-brand-50 ko-py-3 ko-text-xs fw-bold ko-text-brand-700 ko-transition ko-hover-bg-brand-100">
+                    Kelola Tagihan Anggota <i data-lucide="arrow-right" class="ko-h-3-5 ko-w-3-5"></i>
                 </a>
-            </article>
+            </article></div>
         </section>
 
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+        <section class="card ko-radius-card border ko-border-slate-200 bg-white ko-p-6 shadow-sm">
+            <div class="ko-mb-4 d-flex align-items-center justify-content-between">
                 <div>
-                    <h3 class="text-base font-extrabold text-slate-900">Transaksi terbaru</h3>
-                    <p class="text-xs text-slate-500">Aktivitas kas paling baru</p>
+                    <h3 class="ko-text-base ko-fw-heavy ko-text-slate-900">Transaksi terbaru</h3>
+                    <p class="ko-text-xs ko-text-slate-500">Aktivitas kas paling baru</p>
                 </div>
-                <a href="{{ route('admin.transparansi', ['periode_id' => $scope['selected']]) }}" class="flex items-center gap-1 text-xs font-bold text-brand-600 hover:underline">Lihat semua <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i></a>
+                <a href="{{ route('admin.transparansi', ['periode_id' => $scope['selected']]) }}" class="d-flex align-items-center ko-gap-1 ko-text-xs fw-bold ko-text-brand-600 ko-hover-underline">Lihat semua <i data-lucide="chevron-right" class="ko-h-3-5 ko-w-3-5"></i></a>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-left text-xs sm:text-sm">
+            <div class="table-responsive">
+                <table class="table ko-table w-100 ko-border-collapse text-start ko-text-xs ko-sm-text-sm">
                     <thead>
-                        <tr class="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                            <th class="px-3 py-3">Tanggal</th><th class="px-3 py-3">Jenis</th><th class="px-3 py-3">Kategori</th><th class="px-3 py-3">Keterangan</th><th class="px-3 py-3 text-right">Nominal</th>
+                        <tr class="border-bottom ko-border-slate-100 ko-text--11px- fw-bold text-uppercase ko-tracking-wide ko-text-slate-400">
+                            <th class="ko-px-3 ko-py-3">Tanggal</th><th class="ko-px-3 ko-py-3">Jenis</th><th class="ko-px-3 ko-py-3">Kategori</th><th class="ko-px-3 ko-py-3">Keterangan</th><th class="ko-px-3 ko-py-3 text-end">Nominal</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-slate-700">
+                    <tbody class="ko-table-lines ko-divider ko-text-slate-700">
                         @forelse ($transactions as $transaction)
                             <tr>
-                                <td class="px-3 py-3.5 font-medium">{{ $transaction['date'] }}</td>
-                                <td class="px-3 py-3.5"><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $transaction['positive'] ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">{{ $transaction['type'] }}</span></td>
-                                <td class="px-3 py-3.5 font-semibold">{{ $transaction['category'] }}</td>
-                                <td class="px-3 py-3.5 text-slate-500">{{ $transaction['description'] }}</td>
-                                <td class="px-3 py-3.5 text-right font-bold {{ $transaction['positive'] ? 'text-emerald-600' : 'text-rose-600' }}">{{ $transaction['amount'] }}</td>
+                                <td class="ko-px-3 ko-py-3-5 fw-medium">{{ $transaction['date'] }}</td>
+                                <td class="ko-px-3 ko-py-3-5"><span class="rounded-pill ko-px-2-5 ko-py-1 ko-text-xs fw-bold {{ $transaction['positive'] ? 'ko-bg-emerald-50 ko-text-emerald-600' : 'ko-bg-rose-50 ko-text-rose-600' }}">{{ $transaction['type'] }}</span></td>
+                                <td class="ko-px-3 ko-py-3-5 fw-semibold">{{ $transaction['category'] }}</td>
+                                <td class="ko-px-3 ko-py-3-5 ko-text-slate-500">{{ $transaction['description'] }}</td>
+                                <td class="ko-px-3 ko-py-3-5 text-end fw-bold {{ $transaction['positive'] ? 'ko-text-emerald-600' : 'ko-text-rose-600' }}">{{ $transaction['amount'] }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="py-8 text-center text-sm text-slate-500">Belum ada transaksi kas sah pada periode ini.</td></tr>
+                            <tr><td colspan="5" class="ko-py-8 text-center ko-text-sm ko-text-slate-500">Belum ada transaksi kas sah pada periode ini.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
