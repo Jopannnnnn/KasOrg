@@ -2,9 +2,11 @@
 
 KasOrg membantu organisasi mahasiswa mengelola anggota, iuran, pengajuan pembayaran, verifikasi manual, dan pemasukan/pengeluaran hingga laporan keuangan. Proyek Kelompok 4 mata kuliah Pemrograman Web Lanjut ini menggunakan Laravel 12. Status: **DALAM PENGEMBANGAN — BELUM FINAL**, bukan rilis production.
 
+KasOrg mengurangi pencatatan anggota/iuran yang tersebar, kesulitan memeriksa pembayaran, dan perbedaan informasi saldo organisasi. **Admin** mengelola data serta menjalankan tanggung jawab bendahara; **Anggota** melihat kewajiban sendiri dan informasi keuangan yang diizinkan. Arsitektur MVC memisahkan pengolahan request, aturan/data, dan tampilan agar mudah diuji serta dijelaskan saat UTS.
+
 **Atribusi:** Refan merancang dan mengembangkan prototype frontend PHP native; Kent merancang database awal; Jovan mengintegrasikan frontend, database, dan backend ke Laravel. Prototype di `bootstrap/*.php` tetap menjadi acuan desain. Adaptasi Laravel/Bootstrap tidak menghapus hak desain atau menjadikannya desain baru integrator. Kontribusi anggota lain mengikuti pekerjaan serta bukti Git kelompok yang sebenarnya, bukan diasumsikan oleh README ini.
 
-> Penting sebelum clone: kode lengkap di working tree komputer integrasi belum seluruhnya masuk GitHub. HEAD lokal dan branch remote `jovan/integrasi-laravel` terverifikasi pada **9 November 2026** di `f3aa6c47b3045854030a599eabb684437b5cc99f`. Baca [status GitHub](#status-github) sebelum menganggap hasil clone sudah memiliki semua fitur di bawah. **Hasil clone belum dinyatakan lulus pengujian.**
+> **Checkpoint 9 November 2026:** branch lokal dan GitHub `jovan/integrasi-laravel` berada di **`15e32bc76f780dbd0560f3d8c58aae029e5966e4`**. Paket 34 path portal sudah dipush: route, layout, sidebar/topbar dan Blade operasional tersedia bersama backend, migration, model, seeder dan autentikasi. Snapshot sumber yang sama telah diuji terisolasi dengan SQLite, **bukan** fresh clone MySQL/MariaDB di laptop teman. API/Postman masih lokal dan belum termasuk paket clone ini.
 
 <a id="mulai-cepat"></a>
 
@@ -17,12 +19,12 @@ Pilih satu jalur. Panduan ini untuk **dibaca lalu dilakukan secara manual di kom
 | Memakai XAMPP, belum ada instalasi/database | [Tutorial XAMPP dari clone sampai login](#xampp). |
 | Memakai Laragon, belum ada instalasi/database | [Tutorial Laragon dari clone sampai login](#laragon). |
 | Sudah punya database KasOrg dan konfigurasi lokal | [Menjalankan instalasi existing](#existing); jangan generate key atau seed ulang. |
-| Ingin mencoba API JSON | [Tutorial Postman](#postman), setelah source API dan server siap. |
+| Ingin mencoba API JSON | Baca [status API/Postman](#postman): belum tersedia pada checkpoint clone ini; tutorialnya bersyarat untuk integrasi berikutnya. |
 | Ingin memahami kode untuk presentasi | [Peta file](#peta-file) → [empat alur MVC](#alur-kode) → [cara belajar UTS](#belajar-uts). |
 
-Urutan instalasi baru: **clone → VS Code/terminal → dependency PHP → konfigurasi lokal → database kosong → key → migration/seeder → build aset → server → login → Postman**. Tutorial XAMPP dan Laragon di bawah menjelaskan tujuan, hasil dan penanganan kegagalan setiap langkah.
+Urutan instalasi baru: **buka VS Code → Terminal PowerShell → pilih folder XAMPP/Laragon → clone branch → buka folder KasOrg → Composer → konfigurasi privat → database MySQL baru kosong → APP_KEY baru → migration/seeder → npm ci + build Vite → server → login dua role → uji CRUD Anggota**. Postman menyusul setelah paket API terintegrasi. Tutorial XAMPP/Laragon menjelaskan tujuan, hasil yang diharapkan dan tindakan saat gagal; perintahnya tidak dijalankan dalam pembaruan dokumentasi ini.
 
-**Batas penting:** checkpoint GitHub terakhir yang diverifikasi, **f3aa6c4**, belum memuat seluruh source lokal terbaru, termasuk aktivasi route operasional dan layout bersama. Tutorial berikut menjelaskan langkah instalasi yang diperlukan setelah source terkait terintegrasi; **bukan bukti clean clone sudah berjalan**. Bila file/route yang diperlukan belum ada, koordinasikan commit integrasi asli terlebih dahulu; jangan membuat route palsu, memakai halaman preview sebagai pengganti, atau mengimpor SQL historis untuk menutup kekurangan source.
+**Batas bukti:** instalasi dependency/build, 11 migration, seeder dan **45/45 pemeriksaan HTTP/database** berhasil pada ekspor Git index ke folder terpisah dengan SQLite. Route operasional portal dan CRUD Anggota kini committed. **Instalasi MySQL/MariaDB serta fresh clone aktual di laptop anggota belum diuji**; ikuti [skenario manual](#uji-crud) dan catat hasil sendiri. Modul keuangan masih pengembangan/testing, API/Postman perlu integrasi terpisah, dan paket terbaru belum digabung ke main.
 
 ## Daftar isi
 
@@ -36,9 +38,10 @@ Urutan instalasi baru: **clone → VS Code/terminal → dependency PHP → konfi
 - [8. Struktur folder](#struktur), [peta file](#peta-file), dan [alur kode](#alur-kode)
 - [9. Database, relasi, dan arsip Kent](#database)
 - [10. API JSON dan Postman 13 request](#postman)
-- [11. Cara memahami kode untuk UTS](#belajar-uts), [pengujian dan demo](#pengujian)
+- [11. Hasil pengujian](#hasil-uji), [16 skenario CRUD manual](#uji-crud), [checklist laptop anggota](#checklist-laptop), dan [belajar/demo UTS](#belajar-uts)
 - [12. Troubleshooting](#troubleshooting)
 - [13. Status GitHub dan kerja kelompok](#status-github)
+- [Isi paket 34 path dan file yang masih lokal](#distribusi-checkpoint)
 - [14. Batas fitur dan dokumentasi lanjutan](#batas)
 
 <a id="status"></a>
@@ -47,7 +50,7 @@ Urutan instalasi baru: **clone → VS Code/terminal → dependency PHP → konfi
 
 ### Teknologi yang benar-benar digunakan
 
-| Bagian | Kondisi source lokal saat ini |
+| Bagian | Kondisi checkpoint branch dan catatan lokal |
 | --- | --- |
 | Backend | PHP `^8.2`, Laravel `^12.0` (composer.lock: **v12.70.1**), arsitektur MVC dan Eloquent ORM. |
 | Template | Blade di `resources/views/`; bukan membuka PHP native langsung melalui browser. |
@@ -57,7 +60,7 @@ Urutan instalasi baru: **clone → VS Code/terminal → dependency PHP → konfi
 | Database | MySQL/MariaDB; komputer integrasi memakai **`kasorg_dev` pada MariaDB 10.4 XAMPP**. |
 | Aset | Vite, plugin Laravel, Node.js/npm; package-lock.json kini tersedia. Vite terkunci **7.3.7**. |
 | PDF | `barryvdh/laravel-dompdf` **v3.1.2** pada composer.lock untuk unduhan laporan keuangan. |
-| Pengujian | PHPUnit **11.5.57**, fixture SQLite in-memory, runner frontend, serta Postman collection v2.1. |
+| Pengujian | PHPUnit **11.5.57** tersedia sebagai dependency. Snapshot portal diuji HTTP/browser dengan SQLite file terisolasi; suite regresi lengkap/runner frontend dan collection Postman masih lokal, bukan seluruhnya ikut clone. |
 
 Versi tersebut dibaca dari source/lockfile lokal, bukan jaminan setiap versi server atau komputer teman telah diuji. **Blade adalah template engine, Bootstrap adalah framework CSS/JS antarmuka, dan PHP tetap digunakan untuk Controller/Model/Request/Migration/Test.** Migrasi CSS tidak mengubah bahasa backend.
 
@@ -74,32 +77,56 @@ Versi tersebut dibaca dari source/lockfile lokal, bukan jaminan setiap versi ser
 
 Acuan penilaian adalah [ketentuan resmi UTS](docs/referensi-dosen/Ketentuan-UTS-PWL.pdf), bukan jumlah fitur atau commit. Requirement KasOrg masih memiliki bagian draf yang perlu diselaraskan dengan kelompok/dosen.
 
-### Implementasi lokal yang dipertahankan
+### Status fitur
 
-| Portal | Fitur yang tersedia dalam source working tree |
-| --- | --- |
-| Admin | Dashboard; CRUD anggota (pencarian, filter, pagination, aktif/nonaktif, arsip); CRUD jenis iuran; penerbitan tagihan individual; verifikasi pembayaran; CRUD transaksi manual; transparansi; laporan dan PDF. |
-| Anggota | Dashboard organisasi/pribadi; tagihan sendiri; pengajuan tunai/transfer dan bukti transfer; pengajuan ulang setelah penolakan; transparansi, laporan dan PDF sesuai akses. |
-| Bersama | Autentikasi session, validasi/Policy, halaman error, dua API JSON baca-saja, dan collection Postman. |
+CRUD Data Anggota adalah **fitur utama demo UTS**. “Tersedia” berarti source/route operasional ada pada branch pengembangan, bukan fitur final atau sudah lolos MySQL. Hasil SQLite di bawah merujuk [pengujian paket](#hasil-uji), bukan pengujian baru saat menulis README.
 
-Tagihan, pembayaran, transaksi, laporan/PDF dan transparansi adalah fitur produk tambahan terhadap fokus demo MVP; **tidak dihapus atau diganti placeholder**. Ketersediaan source bukan bukti seluruh fitur telah diuji pada revisi terbaru, masuk remote, atau siap production. Preview lokal memakai mock terpisah dan bukan aplikasi operasional.
+| Fitur | Admin | Anggota | Implementasi | Status Pengujian |
+| --- | --- | --- | --- | --- |
+| Login/logout | Login Admin dan logout POST | Login Anggota dan logout POST | Auth Laravel, hash password, CSRF, regenerasi session dan middleware role. | Login/logout, password salah, CSRF dan akses terlarang lulus HTTP SQLite; browser dua role diuji. |
+| Dashboard Admin | Ringkasan kas, anggota aktif, tagihan, periode dan transaksi terbaru | Dilarang membuka portal Admin | Controller/Service data asli dan Bootstrap, bukan angka mock. | Render/navigasi lulus SQLite dengan data kas awal kosong; variasi finansial MySQL belum diuji. |
+| Dashboard Anggota | Portal terpisah sesuai role | Ringkasan organisasi/pribadi, tagihan dan aktivitas yang diizinkan | Blade Bootstrap dan Service bersama; data pribadi dibatasi pengguna login. | Render, login dan smoke desktop/mobile diuji SQLite; bukan regresi seluruh keuangan. |
+| **CRUD Data Anggota** | Create; daftar/cari/filter/pagination; edit; aktif/nonaktif; arsip | GET/POST Admin ditolak 403 | User/Role, Form Request, UserPolicy, CSRF, route model binding dan soft delete. | Penyimpanan, edit, status, arsip, validasi, pencarian dan pagination 5+1 lulus SQLite. Form tambah/edit/hapus diuji browser. |
+| Validasi / perlindungan demo | NIM/email wajib unik; password kuat; demo utama dilindungi | Tidak mengelola anggota | Unique termasuk akun arsip; role ditetapkan server, bukan input bebas. | Input invalid/duplikat dan penolakan hapus demo diuji SQLite; belum semua edge case MySQL. |
+| Jenis Iuran | Daftar, tambah, edit, status; hapus hanya jika belum digunakan | Tidak mengelola master | Bootstrap; nominal baru tidak mengubah tagihan lama; riwayat dilindungi. | Halaman dibuka pada SQLite dan ada bukti fixture terdahulu; CRUD penuh snapshot/MySQL belum diuji ulang. |
+| Tagihan | Terbitkan individual untuk anggota aktif | Melihat tagihan sendiri | Relasi jenis/periode/anggota dan unique mencegah duplikat; terbit tagihan bukan pemasukan. | Halaman/empty state dibuka; alur penuh masih pengembangan/testing. |
+| Pembayaran / upload | Memeriksa pengajuan sesuai izin | Tunai/transfer, gambar bukti privat, pengajuan ulang | Controller/Service, validasi file dan Policy bukti. | Source ada; upload/retry dan seluruh transisi belum diuji ulang pada paket ini. |
+| Verifikasi Pembayaran | Setuju/tolak setelah pemeriksaan manual | Melihat hasil pada tagihan | Approval atomik membuat satu pemasukan; menunggu/ditolak bukan kas. | Halaman dibuka; alur finansial penuh/locking MySQL belum diuji. |
+| Transaksi Kas Manual | Tambah/edit/soft delete manual pada periode yang diizinkan | Tidak mengelola ledger | Transaksi iuran otomatis dilindungi; kategori sesuai jenis. | Halaman dibuka; CRUD keuangan dan berbagai skenario saldo belum diuji ulang. |
+| Transparansi | Melihat informasi organisasi | Melihat informasi organisasi yang diizinkan | Service bersama, filter, alokasi dan tabel tanpa bukti transfer pribadi. | Halaman kedua role dibuka; pengujian finansial lengkap belum dilakukan. |
+| Laporan / PDF | Lihat/unduh sesuai periode | Lihat/unduh sesuai izin | Service bersama dan Dompdf, bukan notifikasi unduh palsu. | Halaman dibuka; render/unduh PDF aktual belum termasuk pengujian paket. |
+| Error 403/404/500 | Pesan Indonesia | Sama | Blade kustom mempertahankan status HTTP asli. | 403 dan 404 nyata diuji; error 500 aktual tidak sengaja dipicu. |
+| API JSON / Postman | Rencana akses session | Rencana akses sesuai role | **Source lokal, belum committed/push**; belum tersedia pada clone checkpoint ini. | Bukti API historis terpisah, **bukan** bagian 45/45 atau bukti endpoint tersedia pada clone. |
 
-### Cara membaca status proyek
+Modul keuangan tetap **DALAM PENGEMBANGAN / TESTING**, bukan dihapus atau diganti placeholder. `/ui-preview/*` hanya aktif pada environment local, memakai mock dan tidak menyediakan autentikasi/CRUD sungguhan. Status iuran Data Anggota, badge sidebar dan notifikasi tertentu masih simulasi/belum terhubung.
 
-| Istilah | Artinya pada KasOrg | Jangan disamakan dengan |
+### Cara membaca bukti
+
+| Istilah | Makna | Bukan berarti |
 | --- | --- | --- |
-| Tersedia di working tree | Source lengkap fitur lokal dapat dibaca; termasuk perubahan yang belum di-commit. | Sudah ikut clone atau tersedia di main. |
-| Tercatat/dipush | Checkpoint sampai f3aa6c4 terverifikasi pada branch integrasi; rincian ada di bagian GitHub. | Seluruh isi working tree sudah terunggah atau hasil clone sudah diuji. |
-| Lulus fixture frontend | Login, dua Dashboard, Anggota dan Jenis Iuran memiliki bukti visual/interaksi terisolasi. | Login HTTP atau penyimpanan MariaDB sudah diuji ulang setelah Bootstrap. |
-| Bukti HTTP/database | Catatan tahap mencatat suite backend dan CLI Postman 13/51 sebelumnya; lihat tanggal/scope buktinya. | Hasil baru tugas README atau jaminan clean clone terbaru. |
-| Belum terintegrasi/diverifikasi | Source lintas fitur belum seluruhnya tercatat di Git; clean clone dan regresi HTTP setelah Bootstrap perlu dibuktikan. | Fitur sengaja dihapus, dibuat placeholder, atau selesai karena HTTP 200. |
+| Committed/dipush | Source tercatat sampai 15e32bc pada branch integrasi. | Sudah masuk main/tag rilis atau production-ready. |
+| Working tree lokal | Ada tambahan API, Postman, test dan dokumentasi yang belum dipush. | Tambahan itu otomatis ikut clone. |
+| Fixture frontend | Geometri/interaksi pada HTML/data buatan terisolasi. | Login HTTP atau MySQL telah diuji. |
+| Paket SQLite terisolasi | Dependency, migration asli, seeder, HTTP dan browser pada salinan index dengan database baru. | Fresh clone laptop teman atau perilaku ENUM/DECIMAL/locking MySQL telah lulus. |
 
 <a id="persyaratan"></a>
 
 ## 2. Persyaratan komputer
 
-- PHP **>= 8.2** yang memenuhi composer.lock; Composer 2; Git; VS Code/editor dan browser modern.
-- Ekstensi PHP: **BCMath**, PDO dan **pdo_mysql**, Ctype, cURL, DOM, Fileinfo, Filter, Hash, Iconv, JSON, Libxml, Mbstring, OpenSSL, PCRE, Session, Tokenizer dan XML. Sebagian merupakan bawaan PHP. Untuk pengujian: **pdo_sqlite/SQLite3** dan XMLWriter. GD disarankan untuk gambar PDF; ZIP/alat ekstraksi membantu Composer.
+| Kebutuhan | Versi/kondisi dan fungsi |
+| --- | --- |
+| Sistem operasi | Windows 10/11 untuk tutorial PowerShell ini; mesin lain perlu penyesuaian path. |
+| Git | Clone branch dan memeriksa revisi; tidak menyalin database/rahasia. |
+| Editor | VS Code atau editor lain; terminal pada root berisi artisan. |
+| PHP CLI | **>=8.2** dan memenuhi composer.lock; paket terisolasi diuji pada PHP 8.2.4, bukan kewajiban memakai patch lama itu. |
+| Composer | Versi 2; install sesuai composer.lock. |
+| Server database | XAMPP atau Laragon dengan MySQL/MariaDB; buat database lokal baru kosong. |
+| Node.js + npm | Node **`^20.19.0` atau `>=22.12.0`** untuk Vite 7.3.7; pengujian memakai Node 22.23.4/npm 10.9.9. |
+| Browser | Chrome/Edge/Firefox modern; Chrome headless dipakai pada uji paket. |
+| Postman | Untuk tahap API **setelah integrasinya tersedia**, bukan syarat membuka CRUD checkpoint ini. |
+| Internet / izin | Dependency, font/ikon/CDN; PHP dapat menulis storage dan bootstrap/cache instalasinya sendiri. |
+
+- Ekstensi PHP: **BCMath**, PDO dan **pdo_mysql**, Ctype, cURL, DOM, Fileinfo, Filter, Hash, Iconv, JSON, Libxml, Mbstring, OpenSSL, PCRE, Session, Tokenizer dan XML. Sebagian merupakan bawaan PHP. Untuk pengujian SQLite diperlukan **pdo_sqlite**; ekstensi SQLite3 terpisah hanya bila runner memerlukannya. XMLWriter diperlukan dependency test. GD disarankan untuk gambar PDF; ZIP/alat ekstraksi membantu Composer.
 - **BCMath wajib untuk perhitungan uang KasOrg**, meskipun belum menjadi `ext-bcmath` eksplisit pada composer.json. Lolos Composer saja belum membuktikan BCMath aktif.
 - MySQL/MariaDB dengan InnoDB dan `utf8mb4_unicode_ci`; lingkungan integrasi yang dipakai adalah MariaDB 10.4 XAMPP. Versi/server lain perlu verifikasi instalasi tersendiri.
 - Node.js yang memenuhi Vite 7.3.7: **`^20.19.0 || >=22.12.0`**, beserta npm. Setup integrator sebelumnya berhasil memakai **Node v22.23.4 / npm 10.9.9**. Node digunakan untuk build aset, bukan menggantikan PHP atau MariaDB.
@@ -119,13 +146,22 @@ node --version
 npm.cmd --version
 ```
 
-`php --ini` menunjukkan php.ini **CLI**; jangan hanya memeriksa PHP Apache. Aktifkan ekstensi pada instalasi yang benar bersama pemilik komputer. README ini tidak menginstal atau mengubah konfigurasi mesin.
+`php --ini` menunjukkan php.ini **CLI**; jangan hanya memeriksa PHP Apache. Bila berbeda, jalankan `where.exe php` dan `Get-Command php`. Contoh XAMPP: `& 'C:\xampp\php\php.exe' -v` dan `& 'C:\xampp\php\php.exe' --ini`. Pada Laragon pilih versi PHP yang sesuai melalui panel, buka terminal baru dan periksa kembali. Pastikan launcher Composer memakai PHP yang sama. Aktifkan ekstensi pada php.ini yang benar bersama pemilik, lalu restart proses terkait. README ini tidak mengubah konfigurasi mesin.
 
 <a id="clone"></a>
 
 ## 3. Panduan instalasi Windows — pilih XAMPP atau Laragon
 
 Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yang disetujui pemilik komputer**. Semua perintah PowerShell dijalankan satu per satu; berhenti saat error, jangan lanjut menebak. Jika folder proyek atau database sudah berisi pekerjaan/data, gunakan [alur existing](#existing).
+
+**Mulai dari VS Code, sebelum menjalankan perintah:**
+
+1. Buka **Visual Studio Code** melalui Start Windows.
+2. Pilih **Terminal → New Terminal**. Pada menu dropdown profil terminal, pilih **PowerShell**; bila perlu pilih **Select Default Profile → PowerShell**, lalu buka terminal baru. Ini memilih shell, bukan memasang PHP/Node atau mengubah PATH Windows.
+3. Pilih **satu** tutorial: XAMPP memakai folder induk `C:\xampp\htdocs`; Laragon memakai `C:\laragon\www`. Pastikan folder induk itu ada, sedangkan folder tujuan `KasOrg` belum berisi pekerjaan lain. Jalankan perintah clone di langkah 2 tutorial yang dipilih, bukan kedua tutorial sekaligus.
+4. Setelah clone, buka folder `KasOrg` melalui **File → Open Folder** atau `code .`. Buka terminal PowerShell di jendela proyek tersebut; `Get-Location` harus menunjuk root KasOrg dan `Test-Path -LiteralPath 'artisan'` harus menghasilkan `True`. Terminal untuk `php artisan serve` dibiarkan berjalan; gunakan terminal kedua jika perlu perintah lain.
+
+Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksaan alat di langkah 1 dahulu. Jangan menempelkan seluruh tutorial sekaligus atau melanjutkan migration setelah perintah sebelumnya gagal.
 
 <a id="xampp"></a>
 
@@ -154,7 +190,7 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
    Set-Location 'C:\xampp\htdocs\KasOrg'
    ~~~
 
-   **Hasil:** root proyek memiliki artisan, composer.json dan resources/. **Jika gagal:** periksa akses GitHub, nama branch, jaringan, dan apakah folder KasOrg sudah ada. Jangan hapus folder existing. Pada checkpoint f3aa6c4, ingat [batas source clone](#mulai-cepat): integrasi lokal belum seluruhnya terunggah.
+   **Hasil:** root proyek memiliki artisan, composer.json dan resources/. **Jika gagal:** periksa akses GitHub, nama branch, jaringan, dan apakah folder KasOrg sudah ada. Jangan hapus folder existing. Checkpoint paket portal adalah **15e32bc**; API/Postman belum ikut. Periksa branch dan HEAD dengan `git branch --show-current` serta `git rev-parse HEAD`, bukan menganggap main sudah sama.
 
 3. **Buka VS Code dan terminal pada root.** Tujuan: supaya perintah menemukan artisan dan dependency yang benar.
 
@@ -162,9 +198,11 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
    code .
    Get-Location
    Test-Path -LiteralPath 'artisan'
+   git branch --show-current
+   git rev-parse HEAD
    ~~~
 
-   **Hasil:** folder aktif C:\xampp\htdocs\KasOrg dan Test-Path menghasilkan True. **Jika gagal:** pilih File → Open Folder secara manual bila command code belum tersedia; pilih Terminal → New Terminal → PowerShell, lalu Set-Location ke root proyek.
+   **Hasil:** folder aktif C:\xampp\htdocs\KasOrg, Test-Path menghasilkan True, branch jovan/integrasi-laravel dan HEAD 15e32bc76f780dbd0560f3d8c58aae029e5966e4 (atau pembaruan berikutnya yang disepakati). **Jika gagal:** pilih File → Open Folder secara manual bila command code belum tersedia; pilih Terminal → New Terminal → PowerShell, lalu Set-Location ke root proyek.
 
 4. **Pasang dependency PHP.** Tujuan: menyediakan Laravel, autoload dan library sesuai lockfile.
 
@@ -182,7 +220,7 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
    Copy-Item -LiteralPath '.env.example' -Destination '.env'
    ~~~
 
-   **Hasil:** .env lokal baru tersedia. **Jika gagal karena sudah ada:** jangan timpa; tinjau bersama pemilik. Template lokal yang disiapkan memakai MySQL, tetapi akun database, password demo dan APP_KEY masih kosong: **jangan migration dulu**. Pada clone, periksa apakah pembaruan template ini sudah ikut revisi yang disepakati.
+   **Hasil:** .env lokal baru tersedia. **Jika gagal karena sudah ada:** jangan timpa; tinjau bersama pemilik. Template pada checkpoint ini memakai MySQL, tetapi akun database, password demo dan APP_KEY masih kosong: **jangan migration dulu**. Lengkapi langkah berikut agar target dan kredensial benar.
 
 6. **Nyalakan layanan dan buat database baru.** Tujuan: menyediakan tempat tabel aplikasi, terpisah dari kasorg_dev integrator. Di XAMPP Control Panel klik **Start MySQL** dan **Start Apache** untuk membuka phpMyAdmin. Buka http://localhost/phpmyadmin melalui browser, pilih Databases/New, masukkan contoh nama **kasorg_local**, pilih collation **utf8mb4_unicode_ci**, lalu Create.
 
@@ -218,13 +256,10 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
     npm.cmd --version
     ~~~
 
-    Jika Node hanya tersedia di Laragon, gunakan [PATH sementara](#aset) untuk proses terminal ini; MySQL/PHP tetap XAMPP. Pada instalasi baru, pilih **satu** perintah dependency:
-    - package-lock.json ada/sesuai → jalankan **npm.cmd ci**.
-    - Belum ada lockfile pada revisi yang disepakati → jalankan **npm.cmd install**, review lockfile hasilnya.
-
-    Setelah dependency berhasil:
+    Jika Node hanya tersedia di Laragon, gunakan [PATH sementara](#aset) untuk terminal ini; MySQL/PHP tetap XAMPP. Lockfile sudah tersedia: jalankan perintah berikut berurutan dan berhenti saat ada error. npm.cmd adalah launcher npm untuk PowerShell tanpa mengubah execution policy:
 
     ~~~powershell
+    npm.cmd ci
     npm.cmd run build
     Test-Path -LiteralPath 'public/build/manifest.json'
     ~~~
@@ -239,9 +274,9 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
 
     **Hasil:** terminal menunjukkan server berjalan; buka http://127.0.0.1:8000/login. MySQL tetap aktif; Apache boleh dihentikan bila tidak lagi memakai phpMyAdmin/virtual host. **Jika gagal:** periksa port 8000, APP_KEY, vendor, layanan database dan izin storage; jangan reset DB. Jangan tutup terminal server selama mencoba aplikasi.
 
-12. **Coba role, CRUD dan API pada data uji.** Tujuan: memastikan integrasi, bukan sekadar halaman tampil. Login dengan email [akun demo](#akun-demo) dan password privat yang baru disiapkan; Admin seharusnya ke Dashboard Admin, Anggota ke Dashboard Anggota. Logout di antara pergantian akun. Gunakan [skenario demo](#pengujian) dengan anggota uji terpisah bila operasi tulis telah disetujui; jangan mengubah akun demo utama.
+12. **Coba dua role dan CRUD Anggota pada data uji.** Tujuan: memastikan integrasi, bukan sekadar halaman tampil. Login dengan email [akun demo](#akun-demo) dan password privat yang baru disiapkan; Admin seharusnya ke Dashboard Admin, Anggota ke Dashboard Anggota. Logout di antara pergantian akun. Gunakan [skenario demo](#pengujian) dengan anggota uji terpisah bila operasi tulis telah disetujui; jangan mengubah akun demo utama.
 
-    **Perintah/aksi:** form browser dan [Postman 01–13](#postman), base_url **http://127.0.0.1:8000**, bukan URL phpMyAdmin. **Hasil yang perlu dibuktikan:** CRUD tersimpan, validasi menolak input salah, Anggota ke halaman Admin mendapat 403, API memakai cookie sesi. **Jika gagal:** lihat [troubleshooting](#troubleshooting) dan kelengkapan route pada revisi clone, bukan membuat mock. Langkah ini adalah rencana verifikasi di mesin teman, **belum hasil pengujian baru**.
+    **Perintah/aksi:** ikuti [16 skenario CRUD](#uji-crud) melalui browser pada http://127.0.0.1:8000, bukan URL phpMyAdmin. **Hasil yang perlu dibuktikan:** CRUD tersimpan, validasi menolak input salah, Anggota ke Admin mendapat 403 dan logout mengakhiri sesi. **Jika gagal:** lihat [troubleshooting](#troubleshooting), lalu laporkan ke kelompok. API/Postman belum dapat didemokan dari checkpoint ini. Ini rencana verifikasi MySQL di mesin teman, bukan hasil yang sudah lulus.
 
 <a id="laragon"></a>
 
@@ -271,7 +306,7 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
    Set-Location 'C:\laragon\www\KasOrg'
    ~~~
 
-   **Hasil:** artisan, composer.json dan resources/ ada. **Jika gagal:** cek jaringan/akses branch/folder existing; jangan gunakan Quick App untuk membuat proyek baru atau menghapus pekerjaan lama. Checkpoint f3aa6c4 masih memiliki [dependensi source yang tertunda](#status-github), sama seperti clone XAMPP.
+   **Hasil:** artisan, composer.json dan resources/ ada. **Jika gagal:** cek jaringan/akses branch/folder existing; jangan gunakan Quick App untuk membuat proyek baru atau menghapus pekerjaan lama. Gunakan checkpoint portal **15e32bc** pada branch integrasi, bukan menganggap main sudah sama. API/Postman tetap [belum terintegrasi](#postman).
 
 3. **Buka VS Code dan terminal.** Tujuan: menjalankan perintah pada root yang benar.
 
@@ -299,7 +334,7 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
    Copy-Item -LiteralPath '.env.example' -Destination '.env'
    ~~~
 
-   **Hasil:** template tersalin tanpa menimpa konfigurasi lama. **Jika sudah ada:** STOP dan gunakan [alur existing](#existing). Jangan menyalin key/password integrator atau langsung migration sebelum target database kosong dan konfigurasi privat dipastikan benar. Periksa pembaruan template MySQL sudah tersedia pada revisi clone.
+   **Hasil:** template tersalin tanpa menimpa konfigurasi lama. **Jika sudah ada:** STOP dan gunakan [alur existing](#existing). Jangan menyalin key/password integrator atau langsung migration sebelum target database kosong dan konfigurasi privat dipastikan benar. Template MySQL dan variabel demo sudah tersedia pada checkpoint 15e32bc; nilainya tetap harus diisi privat.
 
 6. **Jalankan database dan buat database kosong.** Tujuan: menyiapkan server lokal Laragon yang benar. Jalankan layanan MySQL/MariaDB yang dipilih melalui panel Laragon. Buka pengelola database yang tersedia, misalnya HeidiSQL **jika terpasang**, atau phpMyAdmin hanya bila memang dipasang/dikonfigurasi. Hubungkan ke host/port Laragon sebenarnya, lalu buat contoh database baru **kasorg_local** dengan collation utf8mb4_unicode_ci.
 
@@ -327,13 +362,10 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
 
    **Hasil:** tabel/relasi serta [data minimum](#hasil-seeder) tersedia. **Jika gagal:** hentikan, periksa koneksi/ext/FK/password demo; jangan meneruskan seed setelah migration gagal atau menghapus tabel. --database=mysql memilih koneksi Laravel; nama database tetap dari DB_DATABASE. **Bukan instruksi menulis database existing.**
 
-10. **Install dependency frontend, lalu build.** Tujuan: menghasilkan aset Bootstrap MVP dan Tailwind legacy dari source yang sama.
-    - Jika package-lock.json tersedia dan sesuai, jalankan **npm.cmd ci**.
-    - Jika belum ada pada revisi yang disepakati, jalankan **npm.cmd install**, bukan kedua perintah berurutan.
-
-    Kemudian:
+10. **Install dependency frontend, lalu build.** Tujuan: menghasilkan aset Bootstrap MVP dan Tailwind legacy dari lockfile yang tersedia. Jalankan berurutan dan berhenti bila ada error:
 
     ~~~powershell
+    npm.cmd ci
     npm.cmd run build
     Test-Path -LiteralPath 'public/build/manifest.json'
     ~~~
@@ -348,9 +380,9 @@ Kedua tutorial berikut hanya untuk **instalasi baru dan database baru kosong yan
 
     **Hasil:** http://127.0.0.1:8000/login terbuka dan MySQL tetap berjalan. **Jika gagal:** cek port 8000, key, izin runtime, dependency dan server database. Apache/Nginx Laragon tidak diperlukan untuk Artisan; jangan menganggap tombol Start All saja sudah menjalankan Artisan.
 
-12. **Login dua role, periksa CRUD dan API.** Tujuan: memverifikasi hasil instalasi sendiri. Gunakan email [demo](#akun-demo) serta password privat; logout saat berpindah akun, pastikan redirect Dashboard sesuai role. Uji CRUD pada akun uji terpisah setelah izin, validasi salah, dan Anggota membuka Admin mendapat 403. Ikuti [tutorial Postman](#postman) dengan base_url http://127.0.0.1:8000.
+12. **Login dua role dan uji CRUD Anggota.** Tujuan: memverifikasi hasil instalasi sendiri. Gunakan email [demo](#akun-demo) dan password privat; logout saat berpindah akun. Ikuti [16 skenario CRUD](#uji-crud) untuk penyimpanan, validasi, status, arsip dan 403. API/Postman memerlukan integrasi berikutnya.
 
-    **Perintah/aksi:** form browser dan Send/Runner Postman, bukan query SQL manual. **Hasil:** data benar-benar tersimpan, akses dan JSON sesuai kontrak. **Jika gagal:** periksa source/route yang belum dipush, session/cookie dan [troubleshooting](#troubleshooting). Tutorial ini **bukan klaim clean clone Laragon telah lulus uji**.
+    **Perintah/aksi:** form browser pada http://127.0.0.1:8000/login. **Hasil:** data tersimpan dan izin role sesuai; bukti SQL hanya dibaca pada database uji sendiri bila perlu memastikan arsip. **Jika gagal:** periksa revisi, session/cookie dan [troubleshooting](#troubleshooting). Tutorial ini **bukan klaim fresh clone Laragon/MySQL telah lulus uji**.
 
 **Alternatif virtual host Laragon:** hanya gunakan URL seperti http://kasorg.test bila Apache/Nginx aktif dan document root benar-benar **C:\laragon\www\KasOrg\public**, bukan root repository. Sesuaikan APP_URL/base_url Postman serta gunakan satu host/protokol selama session. Ketersediaan automatic virtual host tidak membuktikan document root aman; untuk pemula jalur Artisan di atas sudah cukup.
 
@@ -412,7 +444,7 @@ Ini alur komputer integrasi yang sudah memakai **kasorg_dev**, atau komputer lai
 
 Langkah menyalin template, Composer, key, migration dan seeder sudah dijelaskan berurutan pada [XAMPP](#xampp) dan [Laragon](#laragon); tidak perlu mengulang keduanya. Buka .env lokal melalui editor **hanya pada instalasi baru milik sendiri**.
 
-`.env.example` pada working tree telah disiapkan untuk **MySQL**, database contoh baru **kasorg_local**, session/cache **file**, dan queue **sync**. APP_KEY, akun/password database dan dua password demo sengaja kosong. Pembaruan template/README ini masih lokal sampai mendapat persetujuan Git tersendiri. **Sesuaikan `.env` lokal sebelum migration**; jangan menggunakan template tanpa meninjau target. Contoh aman berikut bukan isi `.env` aktif, dan placeholder `<...>` wajib diganti secara privat:
+`.env.example` pada checkpoint ini memakai **MySQL**, database contoh baru **kasorg_local**, session/cache **file**, dan queue **sync**. APP_KEY, akun/password database serta dua password demo sengaja kosong. **Buat database lebih dahulu dan isi `.env` lokal sebelum migration**; menyalin template tidak membuat database atau akun secara otomatis. Contoh berikut tidak berasal dari `.env` integrator dan tidak berisi kredensial nyata:
 
 ```dotenv
 APP_NAME=KasOrg
@@ -426,8 +458,8 @@ DB_URL=
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=kasorg_local
-DB_USERNAME="<akun-database-lokal>"
-DB_PASSWORD="<isi-secara-privat>"
+DB_USERNAME=
+DB_PASSWORD=
 DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 
@@ -439,6 +471,21 @@ FILESYSTEM_DISK=local
 KASORG_DEMO_ADMIN_PASSWORD=
 KASORG_DEMO_ANGGOTA_PASSWORD=
 ```
+
+| Variabel | Yang harus dipahami/diisi |
+| --- | --- |
+| APP_NAME / APP_ENV | Nama KasOrg dan environment **local** di laptop anggota; Seeder demo menolak production. |
+| APP_KEY | Awalnya kosong; generate sekali untuk instalasi baru. Jangan menyalin atau menimpa key instalasi existing. |
+| APP_DEBUG | false untuk demo aman tanpa stack trace; log dibaca privat bila perlu diagnosis. |
+| APP_URL | URL Artisan/virtual host yang benar. Gunakan host yang sama selama login agar cookie konsisten. |
+| DB_CONNECTION / DB_URL | mysql untuk server MySQL/MariaDB; DB_URL kosong agar URL koneksi lama tidak menimpa field koneksi. |
+| DB_HOST / DB_PORT | Alamat/port server sendiri, contoh 127.0.0.1:3306; konfirmasi jika berbeda. |
+| DB_DATABASE | Nama **database baru kosong yang telah dibuat**, contoh kasorg_local; bukan kasorg_dev integrator. |
+| DB_USERNAME / DB_PASSWORD | Isi privat sesuai akun server sendiri. Username kosong harus dilengkapi; password kosong hanya bila akun lokal benar-benar dikonfigurasi demikian. Jangan mengasumsikan root tanpa password. |
+| DB_CHARSET / DB_COLLATION | utf8mb4 / utf8mb4_unicode_ci sesuai config/database.php. |
+| SESSION_DRIVER / CACHE_STORE | file: folder runtime lokal, bukan mengharuskan tabel session/cache untuk membuka login. |
+| QUEUE_CONNECTION | sync: pekerjaan langsung, tanpa worker queue untuk setup minimum. |
+| KASORG_DEMO_ADMIN_PASSWORD / KASORG_DEMO_ANGGOTA_PASSWORD | Isi privat, berbeda, minimal 8 karakter sesuai UserSeeder; bukan password publik bawaan. |
 
 - `kasorg_local` adalah **contoh nama database baru di laptop anggota**, bukan pengganti/rename kasorg_dev integrator. Pilih nama lokal yang disepakati dan belum berisi data.
 - Driver Laravel `mysql` dapat digunakan untuk MariaDB ini. Host, port, username dan password mengikuti server yang benar; jangan mengasumsikan root tanpa password.
@@ -484,7 +531,15 @@ Sumber: [UserSeeder](database/seeders/UserSeeder.php), [config/demo.php](config/
 - Akun anggota baru dari UI memerlukan password awal minimal **12 karakter**, huruf besar/kecil, angka, simbol dan konfirmasi; maksimum **72 byte**. Admin menyampaikannya secara privat. Edit profil tidak mengganti password; reset mandiri belum tersedia.
 - Admin aktif mengelola anggota/iuran/kas; Anggota mengakses kewajiban pribadi dan informasi organisasi yang diizinkan. Anggota membuka `/admin/anggota` atau `/admin/dashboard` mendapat **403**. Tamu menuju login; akun nonaktif/arsip tidak diizinkan melanjutkan akses.
 
-Role backend hanya **admin** dan **anggota**. Bendahara adalah tanggung jawab Admin, bukan role database ketiga. Akun demo utama dilindungi dari perubahan melalui CRUD Anggota. Detail: [data demo UTS](docs/DATA_DEMO_UTS.md).
+Role backend hanya **admin** dan **anggota**. Bendahara adalah tanggung jawab Admin, bukan role database ketiga. Akun demo utama dilindungi dari perubahan melalui CRUD Anggota. Detail: `docs/DATA_DEMO_UTS.md`.
+
+### Mencoba login dua role
+
+1. Pastikan migration/seeder **instalasi baru sendiri** selesai dan MySQL tetap menyala; jalankan server, lalu buka **http://127.0.0.1:8000/login**.
+2. Isi email `admin@kasorg.test` dan password variabel Admin, lalu Masuk. Harapan: `/admin/dashboard`; buka Data Anggota.
+3. Klik **Keluar** pada sidebar. Jangan mengubah email, NIM, role atau password dua demo utama untuk latihan.
+4. Login dengan `anggota@kasorg.test` dan password variabel Anggota. Harapan: `/anggota/dashboard`; membuka `/admin/anggota` harus **403**, bukan daftar Admin.
+5. Keluar lagi. Halaman terlindungi setelah logout harus mengarahkan ke login. Jika gagal, periksa akun/target database/session privat, bukan membandingkan password plaintext di database.
 
 <a id="aset"></a>
 
@@ -503,21 +558,21 @@ Role backend hanya **admin** dan **anggota**. Bendahara adalah tanggung jawab Ad
 
 ### Instalasi dependency dan build
 
-`package-lock.json` **sudah tersedia di working tree** (lockVersion 3), tetapi belum masuk checkpoint GitHub terakhir. Setelah memperoleh revisi lengkap:
+`package-lock.json` **sudah committed dan ikut clone** (lockVersion 3). Gunakan versi dependency terkunci:
 
 ```powershell
 node --version
 npm.cmd --version
 ```
 
-- Jika **package-lock.json ada dan sesuai package.json**, gunakan `npm.cmd ci` untuk memasang versi terkunci. Perintah ini membangun ulang node_modules, jadi jalankan di lingkungan instalasi yang sesuai, bukan sembarang mengganti dependency orang lain.
-- Jika source yang disepakati **belum memiliki lockfile**, gunakan `npm.cmd install`; review lockfile yang dihasilkan. Ini bukan alasan menjalankan npm update atau audit fix --force.
-
-Kemudian:
+Pasang dependency dan build **berurutan**, hanya jika perintah sebelumnya berhasil:
 
 ```powershell
+npm.cmd ci
 npm.cmd run build
 ```
+
+npm ci membangun ulang node_modules pada instalasi sendiri dan memeriksa kesesuaian package.json/lockfile. Jika lockfile hilang/tidak sesuai, hentikan dan periksa revisi; jangan menghapus lockfile atau menjalankan update/audit fix --force sebagai tebakan.
 
 Keberhasilan ditandai exit code 0, output Vite selesai, **`public/build/manifest.json`** tersedia, dan keempat entry berikut menunjuk file hasil build yang ada. `public/build/` dan node_modules di-ignore: komputer baru perlu install/build sendiri, bukan menganggap bundle ikut clone. Untuk pengembangan, `npm.cmd run dev` pada terminal kedua dapat dipakai bersama Artisan; jangan membagikan `public/hot` milik mesin sendiri.
 
@@ -544,7 +599,7 @@ npm.cmd --version
 
 Ini hanya PATH proses terminal tersebut, bukan pengaturan Windows permanen. Pastikan folder memang tersedia; jangan menyalin path yang tidak ada atau menganggap npm wrapper tanpa executable Node sudah cukup.
 
-**Bukti tahap sebelumnya:** setup integrator dengan Node v22.23.4/npm 10.9.9 menghasilkan lockfile dan build Vite sukses, dua pasangan entry Bootstrap/legacy tersedia. Instalasi saat itu memakai `npm.cmd install --ignore-scripts --no-fund` setelah review script; tidak menjalankan upgrade paksa. Manifest masih tersedia saat dokumentasi diperiksa. Build **tidak dijalankan ulang** untuk pembaruan README ini. [Catatan migrasi](docs/MIGRASI_BOOTSTRAP_MVP.md) masih memuat kondisi awal Node belum tersedia; bedakan catatan historis itu dari setup/build yang sudah dilakukan kemudian.
+**Bukti paket terisolasi 9 November 2026:** Node 22.23.4/npm 10.9.9 berhasil menjalankan npm ci (90 package) dan build Vite 7.3.7; empat entry/output diverifikasi. Bootstrap MVP dan Tailwind legacy dicek terpisah melalui browser. Ini bukti salinan SQLite terisolasi, bukan fresh clone MySQL laptop teman. Build tidak diulang untuk pembaruan README ini. Catatan lokal `docs/MIGRASI_BOOTSTRAP_MVP.md` masih historis dan belum ikut clone.
 
 <a id="struktur"></a>
 
@@ -555,8 +610,8 @@ KasOrg/
 ├── app/
 │   ├── Http/Controllers/    Alur request → service/model → respons
 │   ├── Http/Requests/       Validasi server-side dan izin request
-│   ├── Http/Middleware/     Status akun, role, API JSON, preview lokal
-│   ├── Http/Responses/      Envelope respons API
+│   ├── Http/Middleware/     Status akun, role, preview; tambahan API masih lokal
+│   ├── Http/Responses/      Envelope API, masih lokal/belum ikut clone
 │   ├── Models/              Eloquent dan relasi tabel
 │   ├── Policies/            Otorisasi tindakan pada objek
 │   ├── Providers/           Registrasi policy/provider
@@ -573,13 +628,20 @@ KasOrg/
 │   ├── css/                Entry Bootstrap dan Tailwind Vite terpisah
 │   └── js/                 Entry JavaScript dan inisialisasi aset
 ├── public/                 Document root; css/ khusus dan build/ hasil Vite
-├── routes/                 web.php, api.php, console.php
-├── tests/                  Unit, Feature, Support, Frontend, Browser, Manual
-├── postman/                Collection 13 request dan environment contoh
-├── docs/                   Referensi dosen, panduan tahap, audit, SQL historis
+├── routes/                 web.php dan console.php; api.php masih lokal
+├── tests/                  Unit/Feature tersedia; suite/runner lengkap masih lokal
+├── postman/                Masih lokal: collection 13 request/environment
+├── docs/                   Referensi dosen tersedia; banyak dokumen tahap/arsip masih lokal
 ├── storage/                Session/cache/log/upload privat; bukan source publik
-├── vendor/                 Dependency Composer, jangan diedit langsung
-└── node_modules/           Dependency npm, jangan diedit langsung
+├── vendor/                 Dibuat composer install, tidak ikut clone; jangan diedit
+├── node_modules/           Dibuat npm ci, tidak ikut clone; jangan diedit
+├── composer.json           Dependency PHP, autoload dan script Laravel
+├── composer.lock           Versi dependency PHP terkunci
+├── package.json            Dependency dan script npm/Vite
+├── package-lock.json       Versi dependency frontend terkunci
+├── vite.config.js          Empat entry aset Bootstrap/legacy
+├── .env.example            Template konfigurasi tanpa kredensial
+└── README.md               Panduan instalasi, source, testing dan demo ini
 ```
 
 `bootstrap/app.php` adalah bootstrap Laravel, berbeda dari `bootstrap/login.php` prototype. `bootstrap/cache/` berisi cache generated, bukan source desain. Front controller browser adalah `public/index.php`; Artisan adalah pintu masuk CLI. Jangan mengubah file vendor/cache untuk memperbaiki aturan aplikasi.
@@ -587,6 +649,8 @@ KasOrg/
 <a id="peta-file"></a>
 
 ### Peta file inti — gunakan sebagai petunjuk membaca source
+
+**Legenda distribusi:** tautan relatif ke file/folder dipilih dari path yang sudah tercatat pada checkpoint branch; bukan sekadar ditemukan di laptop integrator. File tracked yang memiliki perubahan lokal tetap memiliki versi GitHub, tetapi isinya belum tentu sama dengan working tree. Path tanpa tautan untuk API, suite regresi/runner, arsip pindahan dan dokumen tahap berarti **masih lokal/belum dipush**, bukan file yang pasti ada setelah clone. `bootstrap/app.php` sudah ada, tetapi perubahan registrasi API/exception JSON lokal belum ikut checkpoint. Peta mempertahankan konteks source lokal untuk integrasi berikutnya; lihat [ringkasan distribusi](#distribusi-checkpoint).
 
 Tidak perlu menghafal semua file. Mulai dari URL yang dibuka, cari route-nya, ikuti Request/Policy, Controller, Model/Service, lalu Blade. Method adalah pekerjaan di dalam class; tabel ini menunjukkan nama **yang ada di source**, bukan fungsi baru yang harus dibuat.
 
@@ -606,7 +670,7 @@ Path pada kolom pertama relatif terhadap **app/Http/Controllers/**.
 | [PembayaranController.php](app/Http/Controllers/PembayaranController.php) | Menyimpan upload privat, menampilkan antrean, memverifikasi dan melayani bukti berizin. | store, index, verify, proof; hapus upload baru bila pengajuan gagal. | IuranService, Request/Policy pembayaran, disk bukti, Blade verifikasi/tagihan. |
 | [Admin/TransaksiKasController.php](app/Http/Controllers/Admin/TransaksiKasController.php) | Menerima aksi tulis kas manual; daftar bacanya tetap di RingkasanKasController. | store, update, destroy; redirect dengan pesan hasil. | Save/DeleteTransaksiKasRequest, TransaksiManualService, transaksi/form.blade.php. |
 | [LaporanController.php](app/Http/Controllers/LaporanController.php) | Menyiapkan laporan HTML dan unduhan PDF memakai hitungan yang sama. | __invoke, pdf, helper data; pagination HTML dan batas 2.000 transaksi PDF. | LaporanKeuanganRequest, RingkasanKasService, Dompdf, laporan/index dan pdf. |
-| [Api/KasController.php](app/Http/Controllers/Api/KasController.php) | Mengembalikan kategori dan ringkasan organisasi, bukan data pribadi pengguna. | categories, summary; select kolom aman dan proyeksi saldo/grafik. | Request Api, KategoriTransaksi, RingkasanKasService, ApiResponse. |
+| `app/Http/Controllers/Api/KasController.php` | Mengembalikan kategori dan ringkasan organisasi, bukan data pribadi pengguna. | categories, summary; select kolom aman dan proyeksi saldo/grafik. | Request Api, KategoriTransaksi, RingkasanKasService, ApiResponse. |
 
 ### 8.2. Form Request — memeriksa input sebelum disimpan
 
@@ -632,8 +696,8 @@ Path pada kolom pertama relatif terhadap **app/Http/Requests/**.
 | [Keuangan/VerifyPembayaranRequest.php](app/Http/Requests/Keuangan/VerifyPembayaranRequest.php) | Memeriksa keputusan Admin; wajib konfirmasi penerimaan atau alasan penolakan. | authorize, rules; disetujui/ditolak, bukan status bebas. | PembayaranIuranPolicy::verify, PembayaranController::verify. |
 | [Keuangan/SaveTransaksiKasRequest.php](app/Http/Requests/Keuangan/SaveTransaksiKasRequest.php) | Memeriksa nominal positif, jenis/kategori cocok, periode, tanggal dan keterangan. | authorize, rules, prepareForValidation; sumber/petugas/FK pembayaran ditetapkan server. | TransaksiKasPolicy, TransaksiKasController, TransaksiManualService. |
 | [Keuangan/DeleteTransaksiKasRequest.php](app/Http/Requests/Keuangan/DeleteTransaksiKasRequest.php) | Memerlukan izin dan checkbox konfirmasi sebelum soft delete kas. | authorize, rules, messages. | TransaksiKasPolicy::delete dan TransaksiKasController::destroy. |
-| [Api/KategoriTransaksiRequest.php](app/Http/Requests/Api/KategoriTransaksiRequest.php) | Menolak filter jenis kategori selain pemasukan/pengeluaran. | rules, attributes; nullable jenis. | Api/KasController::categories, KeuanganRequest. |
-| [Api/RingkasanRequest.php](app/Http/Requests/Api/RingkasanRequest.php) | Menolak periode API yang tidak valid/tidak ada. | rules; periode_id opsional, ID positif existing atau semua. | Api/KasController::summary, Periode, KeuanganRequest. |
+| `app/Http/Requests/Api/KategoriTransaksiRequest.php` | Menolak filter jenis kategori selain pemasukan/pengeluaran. | rules, attributes; nullable jenis. | Api/KasController::categories, KeuanganRequest. |
+| `app/Http/Requests/Api/RingkasanRequest.php` | Menolak periode API yang tidak valid/tidak ada. | rules; periode_id opsional, ID positif existing atau semua. | Api/KasController::summary, Periode, KeuanganRequest. |
 
 ### 8.3. Middleware — menyaring siapa yang boleh lewat
 
@@ -644,7 +708,7 @@ Path pada kolom pertama relatif terhadap **app/Http/Middleware/**.
 | [EnsureAccountIsActive.php](app/Http/Middleware/EnsureAccountIsActive.php) | Menghentikan sesi akun nonaktif/arsip meskipun sebelumnya sudah login. | handle; logout, invalidate dan pesan login. | Alias active di bootstrap/app.php, User::isAktif. |
 | [EnsureRole.php](app/Http/Middleware/EnsureRole.php) | Memastikan role session termasuk role yang diizinkan route. | handle; role salah menghasilkan 403. | Alias role, User::role, route portal/API. |
 | [EnsureLocalPreview.php](app/Http/Middleware/EnsureLocalPreview.php) | Menolak preview pada environment selain local. | handle; abort 404 jika bukan local. | Alias preview.local dan route ui-preview.*. |
-| [EnsureApiJson.php](app/Http/Middleware/EnsureApiJson.php) | Memaksa respons API JSON dan mengubah redirect penolakan akun menjadi 403 JSON. | handle; menetapkan Accept JSON. | routes/api.php, ApiResponse, middleware active. |
+| `app/Http/Middleware/EnsureApiJson.php` | Memaksa respons API JSON dan mengubah redirect penolakan akun menjadi 403 JSON. | handle; menetapkan Accept JSON. | routes/api.php, ApiResponse, middleware active. |
 
 Middleware **auth** dan **guest** berasal dari Laravel; tidak ada file custom Auth palsu. Alias middleware KasOrg serta exception JSON terdaftar di [bootstrap/app.php](bootstrap/app.php).
 
@@ -690,7 +754,7 @@ Path pada kolom pertama relatif terhadap **app/Services/**.
 | --- | --- | --- | --- |
 | [app/Support/DemoAccountProtection.php](app/Support/DemoAccountProtection.php) | Menandai identitas dua demo utama agar tidak terpakai ulang/diubah lewat CRUD. | protects; konstanta EMAILS/NIMS. | UserPolicy dan SaveAnggotaRequest. |
 | [app/Providers/AppServiceProvider.php](app/Providers/AppServiceProvider.php) | Mendaftarkan pemetaan otorisasi pengguna. | boot: Gate::policy(User, UserPolicy). | User dan UserPolicy. |
-| [app/Http/Responses/ApiResponse.php](app/Http/Responses/ApiResponse.php) | Membuat bentuk JSON sukses/gagal yang sama. | success, error; success/message/data/errors dan no-store. | KasController, EnsureApiJson, bootstrap/app.php. |
+| `app/Http/Responses/ApiResponse.php` | Membuat bentuk JSON sukses/gagal yang sama. | success, error; success/message/data/errors dan no-store. | KasController, EnsureApiJson, bootstrap/app.php. |
 
 ### 8.7. Migration — urutan pembentukan tabel dan FK
 
@@ -785,7 +849,7 @@ Path pada kolom pertama relatif terhadap **resources/views/**.
 | [errors/404.blade.php](resources/views/errors/404.blade.php) | Pesan URL/objek tidak ditemukan, status tetap 404. | Brand KasOrg dan tautan aman. | Exception renderer dan layout guest. |
 | [errors/500.blade.php](resources/views/errors/500.blade.php) | Pesan gangguan tanpa SQL/stack trace/path rahasia. | Halaman umum saat debug nonaktif, status tetap 500. | Exception renderer, layout guest, APP_DEBUG. |
 
-Varian [sidebar legacy](resources/views/components/legacy/sidebar.blade.php) dan [topbar legacy](resources/views/components/legacy/topbar.blade.php) dipertahankan untuk halaman tambahan. File dashboard-preview.blade.php dan */preview.blade.php adalah fixture tampilan untuk ui-preview.*, bukan query data asli. [welcome](resources/views/welcome.blade.php) adalah scaffold yang bukan route root sekarang; [saldo-note](resources/views/keuangan/saldo-note.blade.php) masih ada tetapi panel tambahannya tidak lagi dipanggil halaman yang direstorasi. Daftar ini **bukan instruksi menghapus file**.
+Varian [sidebar legacy](resources/views/components/legacy/sidebar.blade.php) dan [topbar legacy](resources/views/components/legacy/topbar.blade.php) dipertahankan untuk halaman tambahan. File dashboard-preview.blade.php dan */preview.blade.php adalah fixture tampilan untuk ui-preview.*, bukan query data asli. [welcome](resources/views/welcome.blade.php) adalah scaffold yang bukan route root sekarang; `resources/views/keuangan/saldo-note.blade.php` masih ada tetapi panel tambahannya tidak lagi dipanggil halaman yang direstorasi. Daftar ini **bukan instruksi menghapus file**.
 
 ### 8.10. CSS/JS — aset dan interaksi
 
@@ -819,16 +883,16 @@ Path pada kolom pertama relatif terhadap **routes/**.
 | NAMA FILE | FUNGSI | METHOD/ISI PENTING | BERHUBUNGAN DENGAN FILE APA |
 | --- | --- | --- | --- |
 | [web.php](routes/web.php) | Memetakan URL halaman/form ke aksi dan pelindungnya. | GET/POST login, POST logout; auth/active/role; route CRUD dan preview local. | Controller, Request/Policy dan named route pada Blade. |
-| [api.php](routes/api.php) | Dua GET JSON session yang dapat diuji Postman. | /kategori-transaksi dan /transparansi/ringkasan; name api.*. | EnsureApiJson, KasController dan bootstrap/app.php. |
+| `routes/api.php` | Dua GET JSON session yang dapat diuji Postman. | /kategori-transaksi dan /transparansi/ringkasan; name api.*. | EnsureApiJson, KasController dan bootstrap/app.php. |
 | [console.php](routes/console.php) | Deklarasi command CLI scaffold. | Command inspire; bukan proses tutup buku. | Registrasi commands pada bootstrap/app.php. |
 
 | NAMA FILE | FUNGSI | METHOD/ISI PENTING | BERHUBUNGAN DENGAN FILE APA |
 | --- | --- | --- | --- |
-| [bootstrap/app.php](bootstrap/app.php) | Mendaftarkan web/API/console/health serta alias middleware dan error JSON. | withRouting, withMiddleware, withExceptions. | routes/*, middleware KasOrg dan ApiResponse. |
+| [bootstrap/app.php](bootstrap/app.php) | Pada checkpoint mendaftarkan web/console/health, alias auth/active/role/preview dan redirect login. | withRouting, withMiddleware; tambahan API/exception JSON masih diff lokal. | routes/web.php dan middleware; ApiResponse belum tersedia pada clone. |
 | [vite.config.js](vite.config.js) | Mendaftarkan empat entry dan plugin build. | Plugin Laravel/Tailwind, input Bootstrap/legacy terpisah. | resources/css, resources/js dan manifest public/build. |
-| [postman/KasOrg-UTS.postman_collection.json](postman/KasOrg-UTS.postman_collection.json) | Request HTTP dan pemeriksaan otomatis untuk demo API/session. | 13 request; script CSRF, cookie, status, privasi dan saldo. | routes/api.php, login/logout, Dashboard Admin. |
-| [postman/KasOrg-Local.example.postman_environment.json](postman/KasOrg-Local.example.postman_environment.json) | Template variabel kosong tanpa kredensial nyata. | base_url, email/password, periode_id, csrf_token, api_saldo_akhir. | Collection Postman dan environment privat pengguna. |
-| [postman/README.md](postman/README.md) | Petunjuk rinci urutan Runner dan bukti sinkronisasi sebelumnya. | Redirect OFF, sesi aktif dan 13 request/51 assertions historis. | Tutorial Postman README ini. |
+| `postman/KasOrg-UTS.postman_collection.json` | Request HTTP dan pemeriksaan otomatis untuk demo API/session. | 13 request; script CSRF, cookie, status, privasi dan saldo. | routes/api.php, login/logout, Dashboard Admin. |
+| `postman/KasOrg-Local.example.postman_environment.json` | Template variabel kosong tanpa kredensial nyata. | base_url, email/password, periode_id, csrf_token, api_saldo_akhir. | Collection Postman dan environment privat pengguna. |
+| `postman/README.md` | Petunjuk rinci urutan Runner dan bukti sinkronisasi sebelumnya. | Redirect OFF, sesi aktif dan 13 request/51 assertions historis. | Tutorial Postman README ini. |
 
 ### 8.12. Tests — contoh perilaku yang seharusnya terjadi
 
@@ -836,28 +900,28 @@ Path pada kolom pertama relatif terhadap **tests/**.
 
 | NAMA FILE | FUNGSI | METHOD/ISI PENTING | BERHUBUNGAN DENGAN FILE APA |
 | --- | --- | --- | --- |
-| [Feature/AuthenticationTest.php](tests/Feature/AuthenticationTest.php) | Memeriksa login dua role, password salah, nonaktif, session, CSRF dan 403. | Fixture SQLite RAM; sebagian skenario browser memerlukan Chrome. | Auth Controller/Request/middleware, FinanceSchema. |
-| [Feature/AnggotaCrudTest.php](tests/Feature/AnggotaCrudTest.php) | Memeriksa penyimpanan/edit/status/arsip, filter, unique dan perlindungan demo. | Kasus valid/invalid dan akses; bukan transaksi data operasional. | AnggotaController, Request/Policy, User dan Blade. |
-| [Feature/JenisIuranCrudTest.php](tests/Feature/JenisIuranCrudTest.php) | Memeriksa master, redirect/hapus dan integrasi tagihan individual. | Snapshot nominal/count/anggota target, konflik dan periode. | Controller/Service jenis dan IuranService. |
-| [Feature/PembayaranFlowTest.php](tests/Feature/PembayaranFlowTest.php) | Memeriksa pengajuan, upload/retry dan satu pemasukan approval. | SQLite default; mode MariaDB hanya opt-in, bukan panduan ini. | IuranService, PembayaranController, storage fake. |
-| [Feature/TransaksiManualTest.php](tests/Feature/TransaksiManualTest.php) | Memeriksa manual CRUD, periode, perlindungan otomatis dan saldo. | Default SQLite; jangan aktifkan mode live MariaDB. | TransaksiManualService/Policy, RingkasanKasService. |
-| [Feature/RingkasanKasTest.php](tests/Feature/RingkasanKasTest.php) | Memeriksa saldo/grafik/filter/privasi dan konsistensi berbagai halaman. | Transaksi sah, soft delete, empty state dan snapshot. | RingkasanKasService/Controller dan Blade. |
-| [Feature/LaporanKeuanganTest.php](tests/Feature/LaporanKeuanganTest.php) | Memeriksa laporan, PDF, nominal dan proyeksi data sesuai role. | SQLite; pemeriksaan PDF/browser bergantung alat yang tersedia. | LaporanController, Dompdf dan service ringkasan. |
-| [Feature/KasApiTest.php](tests/Feature/KasApiTest.php) | Memeriksa JSON/status/auth/query/privasi serta konsistensi saldo. | Session asli dalam test; SQLite default, MariaDB opt-in tidak digunakan. | KasController, ApiResponse, Request/API middleware. |
+| `tests/Feature/AuthenticationTest.php` | Memeriksa login dua role, password salah, nonaktif, session, CSRF dan 403. | Fixture SQLite RAM; sebagian skenario browser memerlukan Chrome. | Auth Controller/Request/middleware, FinanceSchema. |
+| `tests/Feature/AnggotaCrudTest.php` | Memeriksa penyimpanan/edit/status/arsip, filter, unique dan perlindungan demo. | Kasus valid/invalid dan akses; bukan transaksi data operasional. | AnggotaController, Request/Policy, User dan Blade. |
+| `tests/Feature/JenisIuranCrudTest.php` | Memeriksa master, redirect/hapus dan integrasi tagihan individual. | Snapshot nominal/count/anggota target, konflik dan periode. | Controller/Service jenis dan IuranService. |
+| `tests/Feature/PembayaranFlowTest.php` | Memeriksa pengajuan, upload/retry dan satu pemasukan approval. | SQLite default; mode MariaDB hanya opt-in, bukan panduan ini. | IuranService, PembayaranController, storage fake. |
+| `tests/Feature/TransaksiManualTest.php` | Memeriksa manual CRUD, periode, perlindungan otomatis dan saldo. | Default SQLite; jangan aktifkan mode live MariaDB. | TransaksiManualService/Policy, RingkasanKasService. |
+| `tests/Feature/RingkasanKasTest.php` | Memeriksa saldo/grafik/filter/privasi dan konsistensi berbagai halaman. | Transaksi sah, soft delete, empty state dan snapshot. | RingkasanKasService/Controller dan Blade. |
+| `tests/Feature/LaporanKeuanganTest.php` | Memeriksa laporan, PDF, nominal dan proyeksi data sesuai role. | SQLite; pemeriksaan PDF/browser bergantung alat yang tersedia. | LaporanController, Dompdf dan service ringkasan. |
+| `tests/Feature/KasApiTest.php` | Memeriksa JSON/status/auth/query/privasi serta konsistensi saldo. | Session asli dalam test; SQLite default, MariaDB opt-in tidak digunakan. | KasController, ApiResponse, Request/API middleware. |
 | [Unit/DemoAccountConfigurationTest.php](tests/Unit/DemoAccountConfigurationTest.php) | Memeriksa konfigurasi/hash/identitas demo tanpa koneksi database. | Resolver database diblokir; mode Git index opt-in terpisah. | config/demo.php, UserSeeder, UserFactory. |
-| [Unit/SkemaDatabaseKentTest.php](tests/Unit/SkemaDatabaseKentTest.php) | Membandingkan teks migration/arsip, bukan mengimpor SQL. | FK/status/constraint dan keberadaan arsip historis. | database/migrations dan docs/database/historis. |
-| [Support/FinanceSchema.php](tests/Support/FinanceSchema.php) | Membentuk tabel fixture hanya jika testing + SQLite :memory:. | create; guard sebelum DDL RAM. | Feature Test; bukan pengganti uji migration MariaDB. |
-| [Support/ChromiumPasswordCheck.php](tests/Support/ChromiumPasswordCheck.php) | Helper menjalankan skenario browser pada HTML fixture. | run/runInteractive; dapat membuat output sementara saat tes dijalankan. | Authentication/CRUD/browser checks; tidak dijalankan oleh tugas README. |
-| [Frontend/bootstrap-render.php](tests/Frontend/bootstrap-render.php) | Merender Blade dengan fixture tanpa aplikasi/database aktif. | HTML fixture, pemilihan aset, baseline sebelum migrasi. | Runner Frontend dan artifacts lokal. |
-| [Frontend/bootstrap-browser.ps1](tests/Frontend/bootstrap-browser.ps1) | Memeriksa isolasi Bootstrap/legacy dan interaksi umum browser. | Browser/viewport/JS/modal/toggle; tidak menjalankan CRUD database. | HTML fixture, manifest/build dan server aset fixture. |
-| [Frontend/members-visual.ps1](tests/Frontend/members-visual.ps1) | Membandingkan geometri Data Anggota pada viewport sama. | Kartu/filter/tabel/modal dan screenshot. | Renderer, baseline dan kasorg-members.css. |
-| [Frontend/members-interactions.ps1](tests/Frontend/members-interactions.ps1) | Memeriksa interaksi Data Anggota terisolasi. | Modal/toggle/form; bukan penyimpanan MySQL. | Fixture anggota dan browser. |
-| [Frontend/admin-dashboard-visual.ps1](tests/Frontend/admin-dashboard-visual.ps1) | Memeriksa geometri/interaksi Dashboard Admin. | Viewport desktop/mobile dan grafik/empty state fixture. | Renderer, baseline dan CSS Dashboard Admin. |
-| [Frontend/anggota-dashboard-visual.ps1](tests/Frontend/anggota-dashboard-visual.ps1) | Memeriksa Dashboard Anggota dengan data fixture pribadi. | Geometri, filter/navigasi dan tabel pribadi. | Renderer dan CSS Dashboard Anggota. |
-| [Frontend/login-visual.ps1](tests/Frontend/login-visual.ps1) | Memeriksa proporsi Login, input dan toggle mouse/keyboard. | Geometri/interaksi fixture; bukan login HTTP. | Renderer dan kasorg-login.css. |
-| [Frontend/jenis-visual.ps1](tests/Frontend/jenis-visual.ps1) | Memeriksa daftar/filter/modal Jenis Iuran Bootstrap. | Geometri dan interaksi fixture. | Renderer, CSS jenis dan adapter modal. |
+| `tests/Unit/SkemaDatabaseKentTest.php` | Membandingkan teks migration/arsip, bukan mengimpor SQL. | FK/status/constraint dan keberadaan arsip historis. | database/migrations dan docs/database/historis. |
+| `tests/Support/FinanceSchema.php` | Membentuk tabel fixture hanya jika testing + SQLite :memory:. | create; guard sebelum DDL RAM. | Feature Test; bukan pengganti uji migration MariaDB. |
+| `tests/Support/ChromiumPasswordCheck.php` | Helper menjalankan skenario browser pada HTML fixture. | run/runInteractive; dapat membuat output sementara saat tes dijalankan. | Authentication/CRUD/browser checks; tidak dijalankan oleh tugas README. |
+| `tests/Frontend/bootstrap-render.php` | Merender Blade dengan fixture tanpa aplikasi/database aktif. | HTML fixture, pemilihan aset, baseline sebelum migrasi. | Runner Frontend dan artifacts lokal. |
+| `tests/Frontend/bootstrap-browser.ps1` | Memeriksa isolasi Bootstrap/legacy dan interaksi umum browser. | Browser/viewport/JS/modal/toggle; tidak menjalankan CRUD database. | HTML fixture, manifest/build dan server aset fixture. |
+| `tests/Frontend/members-visual.ps1` | Membandingkan geometri Data Anggota pada viewport sama. | Kartu/filter/tabel/modal dan screenshot. | Renderer, baseline dan kasorg-members.css. |
+| `tests/Frontend/members-interactions.ps1` | Memeriksa interaksi Data Anggota terisolasi. | Modal/toggle/form; bukan penyimpanan MySQL. | Fixture anggota dan browser. |
+| `tests/Frontend/admin-dashboard-visual.ps1` | Memeriksa geometri/interaksi Dashboard Admin. | Viewport desktop/mobile dan grafik/empty state fixture. | Renderer, baseline dan CSS Dashboard Admin. |
+| `tests/Frontend/anggota-dashboard-visual.ps1` | Memeriksa Dashboard Anggota dengan data fixture pribadi. | Geometri, filter/navigasi dan tabel pribadi. | Renderer dan CSS Dashboard Anggota. |
+| `tests/Frontend/login-visual.ps1` | Memeriksa proporsi Login, input dan toggle mouse/keyboard. | Geometri/interaksi fixture; bukan login HTTP. | Renderer dan kasorg-login.css. |
+| `tests/Frontend/jenis-visual.ps1` | Memeriksa daftar/filter/modal Jenis Iuran Bootstrap. | Geometri dan interaksi fixture. | Renderer, CSS jenis dan adapter modal. |
 
-Browser/password-toggle.js dan Browser/password-visibility.ps1 berisi skenario toggle/keyboard. TestCase.php adalah dasar Feature Test; ExampleTest.php adalah scaffold/tes ringan, bukan bukti CRUD. Runner [payment-concurrency](tests/Manual/payment-concurrency.php) dan [postman-api-smoke](tests/Manual/postman-api-smoke.php) memiliki ketergantungan lingkungan/data nyata: **jangan dijalankan sebagai tes pemula atau tanpa izin**. Artefak/screenshot dan baseline visual di Frontend/artifacts/ bukan source aplikasi. Cara memilih target tes yang aman ada di [pengujian](#pengujian).
+Browser/password-toggle.js dan Browser/password-visibility.ps1 berisi skenario toggle/keyboard. TestCase.php adalah dasar Feature Test; ExampleTest.php adalah scaffold/tes ringan, bukan bukti CRUD. Runner `tests/Manual/payment-concurrency.php` dan `tests/Manual/postman-api-smoke.php` memiliki ketergantungan lingkungan/data nyata: **jangan dijalankan sebagai tes pemula atau tanpa izin**. Artefak/screenshot dan baseline visual di Frontend/artifacts/ bukan source aplikasi. Cara memilih target tes yang aman ada di [pengujian](#pengujian).
 
 <a id="alur-kode"></a>
 
@@ -913,12 +977,29 @@ Laravel memanggil authorize()/rules pada Form Request sebelum aksi Controller; P
 | [database/migrations/](database/migrations/) | **Satu sumber struktur resmi instalasi Laravel**: kolom, PK, FK dan constraint. Bukan perintah rutin setiap menyalakan server. |
 | [database/seeders/](database/seeders/) | Sumber data awal; bukan salinan seluruh data integrator atau alat reset akun existing. |
 | [app/Models/](app/Models/) | Penghubung Eloquent ke tabel, cast dan relasi; tidak membangun database otomatis saat login. |
-| [sakuorg.sql](docs/database/historis/sakuorg.sql) | Rancangan awal Kent, tetap utuh sebagai arsip historis. |
-| [kasorg.sql](docs/database/historis/kasorg.sql) | Arsip adaptasi Laravel, **masih ada**; bukan file asli Kent atau bukti seluruh adaptasi sudah disetujui Kent. |
+| `docs/database/historis/sakuorg.sql` | Rancangan awal Kent, ada sebagai arsip di working tree; pemindahannya belum committed. Pada checkpoint Git masih tercatat sebagai `database/sakuorg.sql`. |
+| `docs/database/historis/kasorg.sql` | Adaptasi Laravel **masih ada secara lokal**, belum termasuk checkpoint clone. Bukan file asli Kent atau bukti persetujuan Kent atas seluruh adaptasi. |
 
 **Kedua SQL bukan database aktif, bukan sumber koneksi runtime, dan bukan installer resmi. Jangan diimpor ke database Laravel yang aktif.** Arsip mengandung DDL destruktif; komentar import lama di dalamnya tidak mengganti keputusan instalasi melalui migration.
 
-[SkemaDatabaseKentTest](tests/Unit/SkemaDatabaseKentTest.php) masih membaca SQL adaptasi **sebagai teks untuk pengujian statis** dan memeriksa keberadaan arsip Kent. Ini bukan eksekusi/import SQL. Rencana lama menghapus SQL adaptasi/melepas dependensi tes **belum dilakukan**; jangan menganggap rencana sebagai kondisi aktual atau menghapus arsip. Backup eksternal belum dikonfirmasi.
+`tests/Unit/SkemaDatabaseKentTest.php` masih lokal/belum committed dan membaca SQL adaptasi **sebagai teks untuk pengujian statis** dan memeriksa keberadaan arsip Kent. Ini bukan eksekusi/import SQL. Rencana lama menghapus SQL adaptasi/melepas dependensi tes **belum dilakukan**; jangan menganggap rencana sebagai kondisi aktual atau menghapus arsip. Backup eksternal belum dikonfirmasi.
+
+### Tabel aplikasi dan primary key
+
+**Primary key (PK)** adalah identitas unik setiap row, umumnya kolom `id`. **Foreign key (FK)** menunjuk PK/unique key tabel lain dan mencegah relasi tidak sah. Eloquent menerjemahkan relasi itu menjadi objek, misalnya `$tagihan->anggota->name`, bukan ID mentah yang harus ditebak pengguna.
+
+| Tabel / Model | PK dan isi penting dari migration | Fungsi |
+| --- | --- | --- |
+| roles / Role | id; kode unik, nama | Dua role backend admin/anggota; satu role memiliki banyak users. |
+| users / User | id; name, nim unik, email unik, password, role_id, status_akun, deleted_at | Akun login sekaligus data anggota. Password adalah hash; soft delete menandai deleted_at, tidak menghapus row. |
+| kategori_transaksi / KategoriTransaksi | id; nama, jenis, is_sistem; unique nama+jenis dan id+jenis | Kelompok pemasukan/pengeluaran; mendukung FK komposit kategori+jenis ledger. |
+| jenis_iuran / JenisIuran | id; nama unik, nominal DECIMAL(15,2), deskripsi nullable, aktif | Aturan/nominal standar untuk membuat tagihan baru, bukan row kewajiban setiap anggota. |
+| periode / Periode | id; tahun, bulan, tanggal_mulai/selesai, saldo_awal, status, penutupan | Rentang laporan/periode tagihan; unique tahun+bulan serta pasangan batas tanggal. |
+| tagihan_iuran / TagihanIuran | id; user_id, jenis_iuran_id, periode_id, nominal, jatuh_tempo, status, lunas_at | Kewajiban individual; nominal disimpan sebagai snapshot. Unique anggota+jenis+periode. |
+| pembayaran_iuran / PembayaranIuran | id; tagihan_iuran_id, diajukan_oleh, metode, nominal, tanggal_bayar, bukti_path, status, diverifikasi_oleh | Pengajuan/verifikasi; beberapa percobaan dapat merujuk satu tagihan. |
+| transaksi_kas / TransaksiKas | id; tanggal, jenis, kategori_transaksi_id, keterangan, nominal, sumber, dibuat_oleh/diubah_oleh, deleted_at; referensi tagihan/pembayaran nullable unik | Ledger kas sah; transaksi manual/otomatis dibedakan. Soft delete dikeluarkan dari saldo aktif. |
+
+Migration/seeder di GitHub **bukan salinan database MySQL integrator**. Komputer teman mendapat struktur dan data awal ketika menjalankannya pada database baru miliknya; tidak mendapat anggota, bukti transfer atau uang percobaan dari kasorg_dev.
 
 ### Relasi utama dari migration/model
 
@@ -954,7 +1035,7 @@ foreach ($tagihan as $item) {
 
 SQL awal memakai iuran sebagai satu konsep pencatatan, role ENUM pada users, serta procedure/trigger/view. Integrasi memisahkan **jenis_iuran → tagihan_iuran → pembayaran_iuran → transaksi_kas**, memakai tabel roles dan atribut autentikasi User saat ini, serta menempatkan proses verifikasi atomik pada Service Laravel. Konsep periode, kategori dan ledger dari rancangan Kent tetap menjadi fondasi.
 
-Pemisahan mendukung standar nominal vs kewajiban tetap, pengajuan ulang, bukti privat dan pencegahan pemasukan ganda. Ini **pilihan adaptasi**, bukan kewajiban Laravel mengganti rancangan Kent. Backend saat ini tidak langsung cocok dengan skema SQL awal tanpa pemetaan. Notifikasi, arsip PDF permanen, audit_log lengkap dan procedure tutup buku awal belum dibawa sebagai fitur setara; jangan mengklaim seluruh adaptasi telah disetujui Kent. Detail: [review database bersama Kent](docs/REVIEW_DATABASE_BERSAMA_KENT.md).
+Pemisahan mendukung standar nominal vs kewajiban tetap, pengajuan ulang, bukti privat dan pencegahan pemasukan ganda. Ini **pilihan adaptasi**, bukan kewajiban Laravel mengganti rancangan Kent. Backend saat ini tidak langsung cocok dengan skema SQL awal tanpa pemetaan. Notifikasi, arsip PDF permanen, audit_log lengkap dan procedure tutup buku awal belum dibawa sebagai fitur setara; jangan mengklaim seluruh adaptasi telah disetujui Kent. Detail: `docs/REVIEW_DATABASE_BERSAMA_KENT.md`.
 
 ### Sumber perhitungan uang
 
@@ -964,11 +1045,11 @@ Tagihan belum dibayar serta pembayaran menunggu/ditolak **tidak menambah kas**. 
 
 <a id="postman"></a>
 
-## 10. API JSON dan Postman 13 request
+## 10. API JSON dan Postman 13 request — panduan untuk integrasi berikutnya
 
-**Status distribusi:** routes/api.php, controller/Request/API exception handler serta folder postman masih merupakan perubahan lokal yang belum masuk checkpoint f3aa6c4. Bagian ini menjelaskan source working tree; pastikan revisi clone sudah memuat integrasi API sebelum demo.
+**BELUM TERSEDIA DALAM CLONE 15e32bc.** `routes/api.php`, Controller/Request/response/middleware API, registrasi API pada `bootstrap/app.php`, serta collection/environment Postman masih lokal/belum committed. Checkpoint web dapat dipakai untuk login/CRUD, tetapi **dua endpoint di bawah belum terdaftar pada hasil clone**. Semua langkah Send/Runner dalam bagian ini bersifat **bersyarat: hanya setelah paket API benar-benar diintegrasikan dan diuji**. Jangan memakai keberhasilan API historis pada working tree sebagai bukti clone saat ini menyediakan API.
 
-Base URL contoh: `http://127.0.0.1:8000`. Prefix /api didaftarkan di bootstrap/app.php.
+Base URL contoh setelah integrasi: `http://127.0.0.1:8000`. Prefix /api akan memakai registrasi yang sudah ada pada diff lokal bootstrap/app.php, tetapi belum masuk checkpoint ini.
 
 | Method / endpoint | Query opsional | Hasil |
 | --- | --- | --- |
@@ -1033,8 +1114,8 @@ Baca data.saldo_awal/pemasukan/pengeluaran/saldo_akhir dan grafik_bulanan/alokas
 ### Impor dan isi environment
 
 1. Pastikan source API sudah terintegrasi, database yang benar aktif, dan Artisan berjalan. Database existing tidak perlu dimigrasikan/di-seed lagi.
-2. Postman → Import → pilih [KasOrg-UTS.postman_collection.json](postman/KasOrg-UTS.postman_collection.json). Update/replace salinan lama agar script sinkronisasi tidak tertukar.
-3. Import [KasOrg-Local.example.postman_environment.json](postman/KasOrg-Local.example.postman_environment.json), lalu pilih environment **KasOrg Local — contoh tanpa kredensial**.
+2. Postman → Import → pilih `postman/KasOrg-UTS.postman_collection.json`. Update/replace salinan lama agar script sinkronisasi tidak tertukar.
+3. Import `postman/KasOrg-Local.example.postman_environment.json`, lalu pilih environment **KasOrg Local — contoh tanpa kredensial**.
 4. Isi variabel berikut hanya pada nilai **lokal/privat**, bukan file contoh yang akan diunggah:
 
    | Variabel | Pengisian/pemakaian |
@@ -1048,7 +1129,7 @@ Baca data.saldo_awal/pemasukan/pengeluaran/saldo_akhir dan grafik_bulanan/alokas
 5. Jangan mencampur localhost/127.0.0.1 atau port/protokol antar-request. Jika run lama berhenti setelah login, bersihkan cookie **hanya host development tersebut** melalui menu Cookies. Browser login tidak otomatis membuat Postman login.
 6. Pertahankan **Automatically follow redirects OFF** dan cookie jar aktif pada 03–13. Request 01–02 memang menonaktifkan cookie untuk skenario guest; 13 harus memakai cookie hasil logout agar benar-benar menguji sesi berakhir.
 
-Menandai password sebagai secret hanya menyamarkan tampilan. Jangan ekspor/sinkronkan environment yang sudah berisi password, cookie atau token ke repository/workspace bersama. Representasi YAML juga tersedia di [postman/postman/collections/](postman/postman/collections/) dan [postman/postman/environments/](postman/postman/environments/); JSON di atas adalah jalur impor utama.
+Menandai password sebagai secret hanya menyamarkan tampilan. Jangan ekspor/sinkronkan environment yang sudah berisi password, cookie atau token ke repository/workspace bersama. Representasi YAML juga tersedia di `postman/postman/collections/` dan `postman/postman/environments/`; JSON di atas adalah jalur impor utama.
 
 ### Belajar memakai Send sebelum menjalankan Runner
 
@@ -1086,59 +1167,137 @@ Pilih collection → **Run collection / Runner**, pilih environment tadi, satu i
 
 Baca tab **Body** untuk JSON, status HTTP untuk hasil transport, dan **Test Results/Runner** untuk assertions. Respons 422/401/404 pada kasus negatif adalah hasil yang diharapkan, bukan otomatis kegagalan collection. HTTP 200 saja tidak membuktikan nominal benar; script 07 memeriksa rumus dan 08 membandingkan saldo Rupiah Dashboard hingga sen.
 
-Target collection tersinkron: **13 request / 51 assertions / 0 gagal**. [Panduan Postman](postman/README.md) mencatat hasil CLI sebelumnya terhadap aplikasi/database asli dengan fingerprint data tetap; **tidak dijalankan ulang di tugas README ini**, dan GUI sesudah sinkronisasi belum diverifikasi ulang. Collection memakai Admin; dukungan role Anggota/403 diuji terpisah, bukan tercakup seluruhnya oleh 13 request. Runner historis tests/Manual/postman-api-smoke.php menargetkan dua role dan tidak boleh langsung dianggap cocok dengan collection Admin sekarang.
+Target collection tersinkron: **13 request / 51 assertions / 0 gagal**. `postman/README.md` mencatat hasil CLI sebelumnya terhadap aplikasi/database asli dengan fingerprint data tetap; **tidak dijalankan ulang di tugas README ini**, dan GUI sesudah sinkronisasi belum diverifikasi ulang. Collection memakai Admin; dukungan role Anggota/403 diuji terpisah, bukan tercakup seluruhnya oleh 13 request. Runner historis tests/Manual/postman-api-smoke.php menargetkan dua role dan tidak boleh langsung dianggap cocok dengan collection Admin sekarang.
 
 <a id="pengujian"></a>
 
 ## 11. Pengujian dan demo UTS
 
-### Perintah dan batas pengujian
+<a id="hasil-uji"></a>
 
-Setelah environment lokal siap, daftar route dapat diperiksa tanpa aksi CRUD:
+### 11.1. Hasil paket terisolasi — 9 November 2026
 
-```powershell
+Sumber yang diuji adalah **HEAD f3aa6c4 + 34 path index**, kemudian dicatat/dipush sebagai **15e32bc**. Ekspor dilakukan menggunakan checkout-index ke folder baru terpisah, **bukan** menyalin seluruh working tree atau memakai database integrator. Fingerprint staged diff saat pengujian: `5466bb112e09fecd9e7d8acad3d7395d2a741a6c711df9437e8f392d59a5b032`.
+
+| Pemeriksaan yang benar-benar dilakukan | Hasil dan batas |
+| --- | --- |
+| Ekspor sumber | 212 file index; tanpa .env aktif, vendor/node_modules lama, data runtime atau perubahan di luar staging. |
+| Platform | PHP 8.2.4 dengan BCMath/PDO SQLite; Composer platform check lulus. Node 22.23.4/npm 10.9.9. |
+| Composer install | Berhasil dari composer.lock; 118 instalasi, tanpa update dependency. |
+| npm ci | Berhasil memasang 90 package dari package-lock.json pada salinan pengujian. |
+| Vite build | npm run build berhasil dengan Vite 7.3.7; empat entry manifest dan file output diverifikasi. |
+| Migration asli | **11/11 berhasil** pada file SQLite baru di folder pengujian; bukan hanya schema fixture RAM. |
+| Seeder | Berhasil; dua akun demo aktif, password ter-hash/cocok masing-masing dan tidak saling berlaku. Tidak mencetak password/hash. |
+| HTTP/database | **45/45 lulus**: login dua role, password salah, CSRF, token setelah login, navigasi, CRUD/persistensi, unique/validasi, status, soft delete, pagination 5+1, filter, perlindungan demo, 403, 404 dan logout. |
+| Browser | Lulus pada cakupan Chrome headless yang diuji: login, modal/form tambah-edit-hapus, toggle mouse dan keyboard, logout/403; pemisahan aset Bootstrap/legacy; smoke desktop 1440×900 dan mobile 390×844. Bukan audit pixel seluruh halaman. |
+| Integritas | Tidak ada pelanggaran FK SQLite; source salinan tidak diubah untuk meluluskan tes. Source proyek asli, staging dan 77 perubahan di luar paket tetap utuh; kasorg_dev tidak diakses. |
+
+**Belum terbukti:** fresh clone nyata di laptop anggota, migration/seeder dan perilaku MySQL/MariaDB pada laptop itu, seluruh alur keuangan/PDF, integrasi API/Postman pada clone, serta kesiapan production. Pengujian CLI Postman dan fixture lama adalah bukti historis terpisah, bukan tambahan hasil 45/45. Tugas pembaruan README ini **tidak menjalankan ulang** build, migration, seeder, browser atau tes aplikasi.
+
+<a id="uji-crud"></a>
+
+### 11.2. Panduan manual CRUD Data Anggota — jalankan di laptop sendiri
+
+**Prasyarat:** instalasi baru dengan database uji sendiri, misalnya kasorg_local; server/MySQL/build siap. Jangan memakai kasorg_dev, akun asli organisasi atau dua demo utama sebagai target edit/hapus. Gunakan browser biasa; untuk perbandingan akses, keluar sebelum pindah akun atau gunakan profil browser terpisah.
+
+Data uji yang disarankan (cek dahulu agar belum dipakai): nama **Anggota Uji UTS**, NIM **24990001**, email **uts.anggota01@example.test**, status **aktif**. Buat password sendiri secara privat: **minimal 12 karakter**, huruf besar/kecil, angka dan simbol, konfirmasi sama, maksimum **72 byte**. Ini aturan akun anggota baru; dua demo tetap memiliki pengecualian minimum 8 dari Seeder. Tidak ada password contoh publik.
+
+Tabel ini adalah **rencana penerimaan di MySQL, belum klaim semua langkah telah lulus di laptop teman**.
+
+| Test | Langkah dan input/kondisi | Hasil yang diharapkan | Screenshot yang disarankan | Jika hasil berbeda |
+| --- | --- | --- | --- | --- |
+| 1. Login Admin | Buka /login; isi admin@kasorg.test dan password Admin privat lalu Masuk. | Redirect /admin/dashboard; identitas/role Admin, bukan preview. | Dashboard setelah login, tanpa form password/cookie. | Catat URL/status; periksa akun aktif, target DB dan konfigurasi demo; jangan seed/reset sebagai tebakan. |
+| 2. Dashboard | Periksa empat kartu, periode, grafik/empty state dan menu. | Halaman tanpa exception; nol tetap nol pada DB baru. | Dashboard dan filter periode. | Laporkan komponen kosong/error; jangan memasukkan uang palsu agar grafik muncul. |
+| 3. Daftar Anggota | Klik Data Anggota di sidebar. | /admin/anggota menampilkan data, statistik, pencarian, filter, pagination dan Tambah; demo dilindungi. | Daftar awal dengan label akun dilindungi. | Periksa revisi/route/aset; jangan membuat route dummy atau menghilangkan menu. |
+| 4. Create | Klik Tambah anggota; isi data uji di atas, status aktif, password kuat dan konfirmasi sama; Simpan. | Modal tertutup setelah berhasil, notifikasi sukses, row baru tampil sesuai filter/page. | Form identitas tanpa password terlihat dan hasil sukses. | Catat error Indonesia; jika tidak tampak, hilangkan filter atau cari NIM sebelum mengulang submit. |
+| 5. Persistensi | Refresh, lalu cari NIM/email yang baru dibuat. | Data tetap ada setelah request baru, bukan hanya row HTML sementara. | Hasil sesudah refresh. | Laporkan URL/filter dan pesan; jangan mengubah tabel lewat SQL untuk memaksa data ada. |
+| 6. Search/filter/page | Cari nama/NIM/email satu per satu; kosongkan q; pilih status dan jumlah per halaman, klik Filter. Jika ada >5 anggota uji, coba halaman berikutnya. | Hasil sesuai query/status; pagination tidak menghilangkan filter. | Pencarian spesifik dan, jika tersedia, page 2. | Laporkan query/status/per_page dan hasil; jangan membuat banyak akun sah hanya untuk tes. |
+| 7. Update | Klik ikon pensil row uji; ubah nama menjadi Anggota Uji UTS Edit dan email menjadi uts.anggota01.edit@example.test; Simpan. | Tetap pada Data Anggota, sukses, identitas baru tampil; ID/NIM/role/password tidak ikut berubah. | Modal edit dan row terbaru tanpa rahasia. | Periksa error unique; edit profil bukan reset password. |
+| 8. Persistensi update | Refresh; cari nama/email baru, lalu cari nama/email lama. | Nilai baru tersimpan; nilai lama tidak lagi menjadi hasil untuk row tersebut. | Hasil pencarian email baru. | Catat nilai sebelum/sesudah; jangan hanya menyimpulkan dari tampilan sebelum refresh. |
+| 9. Nonaktifkan | Pada row uji, klik aksi Nonaktifkan. | Badge menjadi Nonaktif dan filter nonaktif menemukan row; row belum diarsipkan. | Badge/status nonaktif. | Catat aksi/status/response. Jika mencoba login akun uji itu, harus ditolak; hasil login ini perlu dicatat terpisah. |
+| 10. Aktifkan kembali | Klik Aktifkan pada row uji. | Badge Aktif dan row masuk filter aktif. | Badge setelah aktivasi. | Pastikan yang diklik row uji, bukan demo; laporkan jika status tidak bertahan saat refresh. |
+| 11. Delete/arsip | Klik ikon tempat sampah row uji dan setujui konfirmasi. | Sukses pengarsipan; backend menjalankan soft delete, status nonaktif dan deleted_at terisi. | Pesan arsip dan daftar setelah submit; bukti kolom terbatas melalui query baca di bawah bila diperlukan. | Jangan hard delete/SQL UPDATE. Bila gagal, laporkan pesan dan ID row uji secara privat. |
+| 12. Tidak tampil lagi | Refresh dan cari NIM/email row yang diarsipkan; coba semua status maupun nonaktif. | Row arsip tidak tampil pada daftar biasa, tetapi record/FK tetap ada di DB. Filter nonaktif bukan daftar arsip. | Hasil pencarian kosong; jangan tampilkan kolom password database. | Laporkan jika row hilang permanen atau tetap tampak; jangan membuat fitur restore sendiri. |
+| 13. Unique | Buka Tambah; gunakan NIM yang sama dengan row uji (termasuk yang sudah diarsipkan) dan email baru, lalu ulangi dengan email lama dan NIM baru yang belum dipakai. | Ditolak dengan pesan NIM/email unik; tidak membuat duplikat. | Error per field, tanpa password. | Catat field dan apakah jumlah data berubah. Jangan memakai identitas demo sebagai satu-satunya bukti unique karena demo juga dilindungi Policy/aturan khusus. |
+| 14. Validasi password | Dengan identitas baru yang valid, coba password lemah; lalu password kuat dengan konfirmasi berbeda. Coba juga nama kosong, NIM nonangka dan format email salah. | Penyimpanan ditolak, error berbahasa Indonesia; modal/form sesuai terbuka lagi dan input identitas dipertahankan. | Error validasi dengan input password tetap tersamarkan. | Catat field/pesan dan status; validasi HTML saja belum membuktikan validasi server. |
+| 15. Role/403 | Keluar Admin, login anggota@kasorg.test; buka /admin/anggota dan /admin/dashboard dari address bar. | Anggota ke Dashboard Anggota; akses Admin menghasilkan HTTP 403 dengan halaman kustom, tanpa data anggota Admin. | Halaman 403 dan status Network, tanpa cookie/token. | Laporkan jika 200/data terbuka; jangan menonaktifkan middleware untuk melanjutkan demo. |
+| 16. Logout | Klik Keluar; buka ulang halaman anggota/Admin terlindungi. | Kembali /login dan request baru diarahkan ke login. Reload setelah Back tidak boleh mengizinkan operasi lama. | Login setelah logout atau redirect Network. | Catat host/session; jangan menganggap cache tampilan browser sebagai bukti sesi masih dapat mengubah data. |
+
+**Bukti soft delete, opsional dan read-only:** pada phpMyAdmin pilih **database uji sendiri**, bukan kasorg_dev, lalu jalankan hanya SELECT berikut. Jangan menampilkan kolom password/hash atau menjalankan DELETE/UPDATE manual.
+
+~~~sql
+SELECT id, name, nim, email, status_akun, deleted_at
+FROM users
+WHERE nim = '24990001';
+~~~
+
+Sesudah Test 11, row seharusnya masih ada dengan deleted_at terisi. Ganti NIM sesuai fixture sendiri jika sudah terpakai. Untuk membuktikan server-side validation, penguji yang memahami HTTP boleh memeriksa payload/response di Network atau mengirim request uji ber-CSRF pada lingkungan uji; jangan mengubah source, melewati otorisasi atau mematikan validasi.
+
+**Format laporan ke kelompok:** nama penguji/tanggal, checkpoint dari git rev-parse HEAD, XAMPP/Laragon + versi PHP/server DB, nomor Test, langkah/input nonrahasia, harapan, hasil/status HTTP aktual, dan screenshot tersensor. Jangan kirim .env, password, cookie, token, hash atau bukti transfer pribadi. Bila ada error, hentikan skenario terkait dan minta review; jangan reset database.
+
+<a id="checklist-laptop"></a>
+
+### 11.3. Checklist instalasi dan testing laptop anggota
+
+Semua kotak sengaja belum dicentang; hasil SQLite integrator tidak mengisi bukti MySQL milik teman.
+
+- [ ] Clone branch jovan/integrasi-laravel dan cocokkan checkpoint.
+- [ ] PHP, ekstensi, Composer, Git, Node dan npm sesuai.
+- [ ] composer install dan check-platform-reqs berhasil.
+- [ ] .env lokal dibuat tanpa menimpa konfigurasi existing.
+- [ ] Database MySQL baru kosong dibuat.
+- [ ] Koneksi mengarah ke database sendiri, bukan kasorg_dev.
+- [ ] Dua password demo diatur privat dan berbeda.
+- [ ] APP_KEY dibuat sekali untuk instalasi baru.
+- [ ] Migration berhasil pada target baru yang diverifikasi.
+- [ ] Seeder berhasil dan dua akun demo tersedia.
+- [ ] npm ci berhasil dari lockfile.
+- [ ] npm run build berhasil; empat entry/output ada.
+- [ ] Login Admin berhasil.
+- [ ] Login Anggota berhasil.
+- [ ] Dashboard dan navigasi tampil tanpa error.
+- [ ] CRUD Anggota tersimpan dan tetap benar setelah refresh.
+- [ ] Pencarian, filter dan pagination bekerja.
+- [ ] Aktif/nonaktif serta soft delete bekerja.
+- [ ] Validasi NIM/email/password berjalan.
+- [ ] Anggota mendapat 403 pada akses Admin.
+- [ ] Logout mengakhiri sesi.
+- [ ] Screenshot bukti disimpan tanpa rahasia.
+- [ ] Hasil testing dan kendala dilaporkan ke kelompok.
+
+### 11.4. Pemeriksaan kode dan suite otomatis — bedakan distribusinya
+
+Setelah instalasi sendiri siap, perintah baca berikut membantu memeriksa pendaftaran route; ini bukan pengganti uji CRUD:
+
+~~~powershell
 php artisan route:list
+php artisan route:list --path=admin/anggota
 php artisan route:list --path=api
-```
+~~~
 
-Ini membuktikan pendaftaran route, **bukan** login, visual, CRUD atau konsistensi database. Route operasional dan preview berbeda; /ui-preview/* hanya untuk local dan memakai fixture/mock tanpa backend pembayaran/login.
+Pada checkpoint 15e32bc, filter API belum menunjukkan dua endpoint KasOrg karena paket API belum terintegrasi. /ui-preview/* hanya untuk APP_ENV local, bukan pengganti login operasional.
 
-[phpunit.xml](phpunit.xml) mengatur APP_ENV testing, DB_CONNECTION sqlite, DB_DATABASE :memory:, DB_URL kosong, session/cache array dan queue sync. Fixture [FinanceSchema](tests/Support/FinanceSchema.php) memeriksa target sebelum membuat schema RAM, bukan menjalankan migration pada MariaDB.
+[phpunit.xml](phpunit.xml) mengatur testing, SQLite :memory:, session/cache array dan queue sync. Test konfigurasi demo yang committed dapat dipelajari melalui [DemoAccountConfigurationTest](tests/Unit/DemoAccountConfigurationTest.php); test ini memblokir koneksi DB. Suite lengkap AuthenticationTest, AnggotaCrudTest, FinanceSchema dan runner browser masih lokal, **bukan hasil clone**.
 
-Pengujian PHP dilakukan **di terminal pengujian terpisah**, setelah dependency/ext SQLite tersedia dan source suite ditinjau. Jangan menjalankan dengan config cache aplikasi atau override environment yang mengarah ke database operasional. Contoh persiapan manual:
+**Catatan terbukti dari kode:** [ExampleTest](tests/Feature/ExampleTest.php) yang committed masih mengharapkan GET / berstatus 200, sedangkan [route root](routes/web.php) melakukan redirect. Pada source test lokal, AuthenticationTest masih memeriksa class Tailwind Login dan teks banner lama; AnggotaCrudTest juga memiliki assertion teks yang belum mengikuti catatan layout terbaru. Ini ketidaksesuaian assertion, bukan bukti CRUD rusak. Karena itu jangan menjanjikan seluruh suite sudah selaras/lulus. Perubahan test lokal dan suite lengkap perlu review/integrasi terpisah; README tidak memperbaiki atau menjalankan tes itu.
 
-```powershell
+**Keamanan runner:** beberapa test keuangan/API lokal mempunyai mode opt-in `KASORG_*_MARIADB=1` yang secara eksplisit menargetkan kasorg_dev. Runner `tests/Manual/payment-concurrency.php` juga menulis fixture ke database itu, sedangkan `tests/Manual/postman-api-smoke.php` terikat konfigurasi demo/alat lokal dan belum sesuai collection Admin terbaru. Jangan menjalankannya sebagai langkah instalasi atau pengujian terisolasi. Rollback tidak berarti tidak menyentuh database; persiapan pengujian MySQL terpisah memerlukan review sendiri.
+
+Contoh opsional setelah review target dan persetujuan testing, bukan langkah wajib menyalakan aplikasi:
+
+~~~powershell
 if (Test-Path -LiteralPath 'bootstrap/cache/config.php') {
-    throw 'Ada cache konfigurasi. Tinjau target dan cache bersama pengelola sebelum menjalankan tes.'
+    throw 'Ada cache konfigurasi; tinjau bersama pengelola sebelum tes.'
 }
 if (Get-ChildItem Env: | Where-Object { $_.Name -match '^KASORG_.*_MARIADB$' -and $_.Value -eq '1' }) {
-    throw 'Mode pengujian MariaDB aktif. Hentikan; panduan ini hanya untuk SQLite terisolasi.'
+    throw 'Mode MariaDB aktif; hentikan. Contoh ini tidak menguji database operasional.'
 }
-$env:APP_ENV = 'testing'
-$env:DB_CONNECTION = 'sqlite'
-$env:DB_DATABASE = ':memory:'
-$env:DB_URL = ''
-$env:SESSION_DRIVER = 'array'
-$env:CACHE_STORE = 'array'
-$env:QUEUE_CONNECTION = 'sync'
-php vendor/phpunit/phpunit/phpunit --configuration phpunit.xml --testsuite Unit
-php vendor/phpunit/phpunit/phpunit --configuration phpunit.xml --testsuite Feature
-```
+php vendor/phpunit/phpunit/phpunit --configuration phpunit.xml --filter DemoAccountConfigurationTest
+~~~
 
-Tutup terminal pengujian sesudahnya agar override proses tidak terbawa ke server aplikasi. Jangan mengaktifkan KASORG_FINANCE_MARIADB, KASORG_MANUAL_MARIADB, KASORG_SUMMARY_MARIADB atau KASORG_API_MARIADB; runner Manual/concurrency juga bukan bagian panduan aman ini. Beberapa tes browser membutuhkan Chrome dan menghasilkan artefak sementara ketika dijalankan. Perintah di atas **belum dijalankan ulang pada tugas dokumentasi**, bukan jaminan semua assertion lama sudah selaras dengan Bootstrap.
+Jalankan pada terminal pengujian terpisah, bukan memakai mode KASORG_*_MARIADB=1 atau runner Manual/concurrency tanpa izin. Pemeriksaan source/lint hanya membuktikan sintaks; build hanya membuktikan bundling; fixture hanya membuktikan data/interaksi uji; SQLite tidak membuktikan ENUM/DECIMAL/locking MySQL. Uji seluruh branch terintegrasi harus dilakukan sebelum PR/main/tag.
 
-| Jenis bukti | Yang dibuktikan / tidak dibuktikan |
-| --- | --- |
-| Source dan lint | Struktur/sintaks; bukan operasi nyata atau keamanan penuh. |
-| Build Vite | Dependency/entry dapat dibundel; bukan hasil CRUD atau kesamaan tampilan. |
-| Fixture frontend | Render, geometri, interaksi browser pada data terisolasi; **bukan koneksi MariaDB atau login HTTP**. |
-| PHPUnit SQLite | Validasi/alur backend pada fixture RAM; bukan semua perilaku ENUM/locking MariaDB atau uji migration MariaDB. |
-| Postman | HTTP/session/JSON/status sesuai request; bukan seluruh CRUD atau semua halaman browser. |
-| End-to-end | Login nyata, navigasi, penyimpanan, akses role, logout dan konsistensi pada lingkungan demo yang disetujui; harus dibuktikan terpisah. |
-
-**Bukti frontend tahap sebelumnya, bukan run README:** Data Anggota 84 geometri/30 frontend; Dashboard Admin 180/72; Dashboard Anggota 408/219; Login 612/189; Jenis Iuran 960/276. Pemeriksaan umum bundle-local 177 assertions juga dilaporkan lulus. Viewport: 1440×900, 1366×768, 390×844. Semuanya fixture, bukan database aktif.
-
-Runner di tests/Frontend/ menyimpan output di artifacts/ yang di-ignore. **pre-bootstrap-views.json adalah input baseline**, bukan output yang boleh dibuang; belum tersedia dari clone jika masih hanya lokal. Mode aset build runner juga memerlukan server aset fixture yang sesuai (origin 127.0.0.1:9146), tidak otomatis berarti server itu sedang berjalan. Karena itu jangan menjanjikan suite visual langsung dapat diulang di laptop teman tanpa baseline/browser/persiapan aset. Bukti suite aplikasi historis 232 tes/2.942 assertions ada di [audit](docs/AUDIT_FINAL_UTS_KASORG.md); bukan hasil ulang setelah semua perubahan Bootstrap.
+Bukti fixture frontend terdahulu (terpisah dari paket HTTP): Data Anggota 84 geometri/30 frontend; Dashboard Admin 180/72; Dashboard Anggota 408/219; Login 612/189; Jenis Iuran 960/276; pemeriksaan umum bundle-local 177 assertions. Viewport historis 1440×900, 1366×768, 390×844. Catatan suite 232 tes/2.942 assertions dan baseline runner ada di dokumen/source lokal, **bukan hasil ulang checkpoint clone**. Jangan membuang pre-bootstrap-views.json sebagai output sementara; runner/baseline belum ikut clone dan memerlukan persiapan khusus.
 
 <a id="belajar-uts"></a>
 
@@ -1175,13 +1334,13 @@ Saat presentasi, tunjukkan satu contoh data uji yang disetujui dan jelaskan jalu
 
 ### Alur demo inti
 
-**Login Admin → Dashboard → CRUD Anggota → validasi salah → login Anggota/403 → API Postman → logout.**
+**Demo checkpoint saat ini: Login Admin → Dashboard → CRUD Anggota → validasi salah → logout → login Anggota/403 → logout.** API JSON/Postman tetap persyaratan UTS yang harus diselesaikan melalui integrasi berikutnya, bukan diklaim sudah ada pada clone ini.
 
 1. Konfirmasi source terintegrasi, server/database/aset siap, serta akun demo privat benar.
 2. Login Admin; tunjukkan Dashboard dan periode/saldo nyata, termasuk nol bila belum ada transaksi sah.
 3. Gunakan anggota uji terpisah yang disetujui untuk tambah/edit/status/arsip; tunjukkan validasi NIM/email/password salah tanpa menampilkan rahasia. Jangan mengubah dua demo utama atau data sah kelompok.
 4. Login Anggota pada sesi yang tepat; akses halaman Admin harus 403. Jangan memakai URL role palsu.
-5. Jalankan Postman 01–13 dengan sesi Admin Postman sendiri, tunjukkan 200/422/401, CSRF/logout dan kesesuaian saldo API–Dashboard.
+5. **Setelah paket API tersedia saja:** tambahkan Postman 01–13 dengan sesi Admin Postman sendiri untuk menunjukkan 200/422/401, CSRF/logout dan kesesuaian saldo. Sebelum itu, laporkan gap API secara jujur; jangan memakai endpoint palsu.
 6. Logout melalui POST yang benar. Jelaskan satu alur Route → Request/Policy → Controller → Model/Service → database → Blade/JSON.
 
 Jenis Iuran dapat ditunjukkan sebagai pendukung. Pembayaran, PDF, transaksi dan transparansi tetap dipertahankan tetapi tidak harus memakan seluruh waktu demo MVP. Demo tulis hanya memakai data pengujian yang disetujui; jangan merekayasa status pembayaran melalui SQL.
@@ -1192,35 +1351,48 @@ Penyerahan tetap memerlukan alur inti teruji di main/tag **mvp-rc**, bukti commi
 
 ## 12. Troubleshooting
 
-| Masalah | Pemeriksaan/tindakan minimum yang aman |
-| --- | --- |
-| PHP/Composer tidak terbaca | Periksa PATH/terminal, php --version/--ini; gunakan executable PHP XAMPP/Laragon yang benar. Install dependency dari lock, bukan membuat project baru atau update sembarangan. |
-| BCMath/ekstensi hilang | Periksa php -m dan php.ini CLI/web yang benar; pemilik mengaktifkan ekstensi lalu restart proses terkait. Jangan mengganti uang menjadi float. |
-| Node/npm tidak terbaca | Periksa where.exe node/npm, buka terminal baru; gunakan npm.cmd atau PATH sementara [bagian aset](#aset). npm wrapper saja belum cukup. |
-| npm run build gagal | Baca error pertama, cocokkan versi Node, kelengkapan dependency dan empat entry Vite. Jika npm ci melaporkan lock tidak sesuai, review package.json/lockfile; jangan menghapus lock/node_modules atau upgrade paksa sebagai tebakan. |
-| Database connection refused / access denied | Periksa layanan MySQL, host/port dan izin akun secara privat. Jangan mengganti database, mengasumsikan root tanpa password atau mengunggah kredensial. |
-| Unknown database / table not found | Pastikan target existing vs baru. Pada existing, koordinasikan perbedaan skema; jangan import SQL atau reset. Instalasi baru hanya mengikuti bagian 5 setelah izin/target kosong pasti. |
-| APP_KEY belum tersedia | Hanya instalasi baru: key:generate setelah konfigurasi siap. Existing: koordinasikan konfigurasi asli; jangan mengganti/mencetak key. |
-| Seeder menolak password demo | Isi dua variabel sesuai config/demo.php secara privat, berbeda, minimal 8; pastikan local/testing dan role tersedia sesuai urutan. Jika konflik identitas/seed parsial, berhenti dan review, bukan overwrite/seed berulang tanpa izin. |
-| Login ditolak | Periksa akun aktif, email/password privat dan target DB; environment password demo tidak mengubah hash existing. Perhatikan pembatasan percobaan login. |
-| RouteNotFoundException | Bandingkan source/revisi clone dan route:list. Checkpoint f3aa6c4 belum memuat seluruh route sidebar; integrasikan source asli yang tertunda, jangan membuat route dummy/menyembunyikan fitur. |
-| HTTP 403 | Role, status akun atau Policy menolak; gunakan portal/pemilik yang benar. Jangan menonaktifkan middleware. |
-| HTTP 419 | Token kedaluwarsa atau cookie/session beda host. Buka ulang form; Postman ambil 03 sebelum login dan 08 sebelum logout. Jangan mematikan CSRF. |
-| API 401 / Postman tidak membawa sesi | Jalankan login di Postman, pilih environment yang benar, cookie jar aktif, host/port/protokol konsisten. Login browser bukan login Postman; bearer token tidak digunakan. |
-| API 404 / 422 | 404: URL/API belum terdaftar di revisi itu; periksa prefix. 422: lihat errors field dan periode_id/jenis yang valid. Request negatif collection memang mengharapkan status ini. |
-| Error 500 | Periksa log **secara privat**: ekstensi, konfigurasi, izin runtime atau exception. Jangan membagikan SQL/stack trace/path/token/.env atau mereset database. |
-| Bootstrap/CSS/JS tidak tampil | Periksa Network browser, manifest + empat file output, public/hot/dev server, CSS public/css dan error JS/CDN. Jangan memuat bundle CDN tambahan di atas Vite. |
-| Tampilan teman berbeda | Samakan commit, lockfile/build, viewport/zoom, font/ikon/jaringan dan route MVP vs legacy. Fallback lama/cache browser bukan bukti source sama. Jangan langsung redesign. |
-| Grafik kosong / angka nol | Periksa periode dan transaksi sah. Tagihan, menunggu dan ditolak tidak menambah kas; jangan mengganti nol dengan mock. |
-| Port bentrok | Tentukan layanan/server yang benar; gunakan port kosong setelah koordinasi lalu selaraskan APP_URL/base_url. Jangan mematikan proses yang tidak dikenal sembarangan. |
+Baca error pertama, catat revisi dan langkah penyebab, lalu diagnosis pada laptop/database sendiri. **Reset database bukan solusi umum.** Jangan membagikan log mentah, password, APP_KEY, hash, cookie/token atau bukti pembayaran.
 
-Jangan membagikan log, cookie, environment hasil run, password/hash, atau bukti transfer. .gitignore melindungi sejumlah path runtime, tetapi bukan bukti histori Git otomatis bebas rahasia.
+| Masalah | Penyebab umum | Diagnosis | Solusi aman |
+| --- | --- | --- | --- |
+| PHP tidak dikenali | PATH/terminal menunjuk instalasi salah. | where.exe php, Get-Command php; cek file PHP XAMPP/Laragon. | Gunakan executable yang benar atau PATH terminal setelah persetujuan pemilik; buka terminal baru. |
+| PHP terlalu lama | CLI berbeda dari PHP panel. | php -v dan php --ini; bandingkan >=8.2/lockfile. | Pilih PHP kompatibel; jangan menurunkan Laravel atau mengabaikan platform requirements. |
+| Composer install gagal | Ekstensi/versi PHP, jaringan atau izin. | Baca error pertama; composer check-platform-reqs setelah dependency tersedia. | Perbaiki kebutuhan mesin bersama pemilik, ulang install dari lock; bukan composer update/setup otomatis. |
+| Ekstensi hilang / could not find driver | php.ini CLI salah; pdo_mysql/BCMath/XML/Fileinfo belum aktif. | php -m dan php --ini pada PHP yang menjalankan Artisan/Composer. | Aktifkan ekstensi pada instalasi benar, restart proses; jangan ganti perhitungan uang ke float. |
+| Node/npm tidak dikenali | PATH terminal lama/Node belum tersedia. | where.exe node, where.exe npm, node -v, npm.cmd -v. | Terminal baru atau PATH proses seperti bagian aset; npm.cmd bila npm.ps1 diblokir. |
+| npm ci gagal | Node tidak kompatibel, jaringan, lockfile tidak sesuai atau file terkunci. | Cocokkan Node engine, package.json/lockfile dan pesan error. | Hentikan, review source/lock bersama tim; jangan hapus lock atau menjalankan upgrade/audit fix --force. |
+| Vite build / manifest hilang | Dependency/build belum selesai atau entry/output tak lengkap. | npm.cmd run build; periksa public/build/manifest.json dan empat file output. | Build setelah npm ci berhasil. Bundle tidak ikut clone; fallback CDN bukan bukti build. |
+| Class not found | vendor/autoload hilang atau source tak sesuai revisi. | Cek vendor/autoload.php, composer install dan keberadaan class pada Git checkpoint. | Pulihkan instalasi dependency sesuai lock/koordinasikan file asli; jangan membuat class dummy. |
+| APP_KEY belum dibuat | Konfigurasi instalasi baru belum lengkap. | Periksa keberadaan key secara privat, jangan mencetaknya. | Instalasi baru: key:generate sekali. Existing: koordinasikan konfigurasi asli, jangan rotasi key. |
+| SQLSTATE connection refused | MySQL belum aktif, host/port salah atau port dipakai server lain. | Panel XAMPP/Laragon dan host/port pada .env lokal sendiri. | Jalankan server yang benar/selaraskan port; jangan menutup proses asing tanpa izin. |
+| Access denied | Akun/password/izin DB tidak cocok. | Uji kredensial secara privat di pengelola DB sendiri; pastikan server tujuan benar. | Perbaiki .env lokal sesuai akun sah, bukan mengasumsikan root tanpa password. |
+| Unknown database | DB_DATABASE belum dibuat/salah server. | Periksa nama database kosong di phpMyAdmin/HeidiSQL. | Buat target baru yang disetujui; jangan rename/drop database existing atau mengimpor SQL historis. |
+| Migration / foreign key gagal | Skema target tidak kosong/parsial, urutan atau kemampuan server berbeda. | Catat migration pertama yang gagal, versi DB, target dan constraint; jangan lanjut seed. | STOP dan review skema/backup bersama tim. Jangan mematikan FK, reset atau mengedit migration agar terlihat lulus. |
+| Seeder password kosong/sama | Dua variabel belum diisi, environment salah atau cache lama. | Tinjau .env lokal privat, config/demo.php, local/testing dan urutan RoleSeeder. | Isi dua nilai berbeda minimal 8; seed hanya pada instalasi baru yang diverifikasi. Existing/seed parsial perlu review sebelum pengulangan. |
+| Seeder konflik identitas | NIM/email demo dipakai row lain atau demo telah diarsipkan/diubah. | Tinjau pesan serta identitas tanpa membuka password/hash. | Hentikan; koordinasikan, jangan overwrite/hard delete untuk memaksa seed. |
+| Login gagal setelah password demo .env diganti | Seeder tidak memperbarui password akun yang sudah ada. | Konfirmasi apakah akun dibuat pada seed sebelumnya; jangan mencetak password atau hash. | Gunakan kredensial yang dipakai saat akun dibuat atau koordinasikan pemulihan yang sah. Jangan seed/reset database untuk menebak password. |
+| Login gagal | Email/password salah, target DB salah atau rate limit. | Cocokkan email demo dan password privat; perhatikan pesan percobaan login. | Tunggu batas bila perlu; config password environment tidak mereset hash akun existing. |
+| Akun nonaktif ditolak | Aturan status_akun aktif memang diwajibkan. | Periksa status melalui Admin yang sah pada row yang tepat. | Bukan bug untuk dilewati; jangan mengubah demo atau SQL manual demi login. |
+| HTTP 403 | Role/status/Policy menolak aksi. | Periksa akun dan URL tujuan. | Anggota ke Admin memang harus 403; jangan menonaktifkan authorization. |
+| HTTP 404 | Path/objek tidak ada; API belum terintegrasi pada checkpoint ini. | Cek URL, route:list dan model binding. | Gunakan route/objek sah; koordinasikan integrasi, jangan route dummy. |
+| HTTP 419 CSRF | Token kedaluwarsa atau cookie berbeda host/session. | Buka ulang form; gunakan satu host/protokol, cek session. | Login ulang bila perlu, pertahankan CSRF. Langkah token Postman hanya setelah paket API tersedia. |
+| HTTP 500 | Exception, konfigurasi/ekstensi atau izin runtime. | Pengelola membaca log privat, catat error pertama tanpa membagikan SQL/stack trace/rahasia. | Perbaikan harus sesuai penyebab dan persetujuan, bukan reset DB atau membuka APP_DEBUG pada demo publik. |
+| RouteNotFoundException | Checkout salah atau nama route/file tidak konsisten. | git rev-parse HEAD, git branch --show-current, php artisan route:list. | Pada 15e32bc route sidebar portal sudah ada; jika hilang pastikan revisi/source utuh. Jangan menyembunyikan menu atau membuat route palsu. |
+| View not found | File Blade/include tidak lengkap atau salah revisi. | Cocokkan nama view dengan resources/views dan commit. | Koordinasikan file asli; jangan placeholder. Jangan menyalin seluruh working tree privat integrator. |
+| CSS berantakan / modal tidak aktif | Aset gagal, public/hot ke server lain, reset ganda atau script belum dimuat. | Network/Console browser, manifest, empat output, route Bootstrap vs legacy. | Gunakan build lokal dan satu jalur CSS/JS per halaman; jangan tambah bundle CDN di atas Vite atau langsung redesign. |
+| Port 8000 terpakai | Server lain masih berjalan. | Baca pesan Artisan dan konfirmasi pemilik proses. | Pakai port kosong, misalnya php artisan serve --host=127.0.0.1 --port=8001; set APP_URL=http://127.0.0.1:8001 dan buka /login pada port itu. Jangan mematikan proses tidak dikenal. |
+| Permission storage/cache | PHP tidak dapat menulis folder runtime instalasinya. | Tinjau pemilik/ACL storage dan bootstrap/cache. | Beri izin seperlunya untuk pengguna/proses sendiri, bukan Everyone full control atau chmod 777 umum. |
+| PDF gagal dirender | Dependency/font/gambar/ekstensi tidak tersedia, periode invalid atau batas 2.000 transaksi. | Periksa error privat, versi Dompdf dan periode; GD disarankan untuk gambar. | Gunakan dependency terkunci/lingkup lebih sempit; jangan aktifkan remote/PHP execution Dompdf atau mengklaim berhasil tanpa file valid. |
+| Grafik kosong/angka nol | Belum ada transaksi sah atau filter periode berbeda. | Periksa periode/data kas yang sah pada DB sendiri. | Nol/empty state valid; jangan mengisi mock. Tagihan dan pembayaran menunggu/ditolak bukan pemasukan. |
+| API/Postman tidak jalan | Paket API belum tersedia pada checkpoint clone ini. | route:list --path=api dan status source/collection. | Tunggu integrasi dan tes terpisah. Setelah tersedia, diagnosis 401/session atau 422/parameter mengikuti bagian Postman. |
+
+Jika harus membaca log atau konfigurasi privat, lakukan bersama pemilik mesin dan sensor bukti. README ini tidak memberi izin mengubah data sah, database integrator, atau source tanpa review.
 
 <a id="status-github"></a>
 
 ## 13. Status GitHub dan kerja kelompok
 
-Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **jovan/integrasi-laravel**. Pada **9 November 2026**, HEAD lokal dan SHA branch remote diperiksa secara read-only melalui `git ls-remote`: keduanya **f3aa6c47b3045854030a599eabb684437b5cc99f**. Tidak ada fetch, staging, commit atau push dalam pembaruan ini. Histori lokal menuju checkpoint tersebut memuat:
+Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **jovan/integrasi-laravel**. Pada **9 November 2026**, HEAD lokal dan SHA branch remote diperiksa secara read-only melalui `git ls-remote`: keduanya **15e32bc76f780dbd0560f3d8c58aae029e5966e4**. Tidak ada fetch, staging, commit atau push dalam pembaruan ini. Histori lokal menuju checkpoint tersebut memuat:
 
 | Urutan | Commit | Isi checkpoint |
 | --- | --- | --- |
@@ -1238,13 +1410,71 @@ Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **
 | 12 | e1e3ddc | Backend Jenis Iuran; belum aktivasi route/tampilan operasional. |
 | 13 | ccd4f1b | Backend Tagihan/Pembayaran/Verifikasi dan disk privat bukti. |
 | 14 | 2218519 | Backend Transaksi Kas Manual — DALAM PENGEMBANGAN. |
-| 15 | **f3aa6c4** | Backend Laporan/PDF dan dependensi Dompdf — DALAM PENGEMBANGAN. |
+| 15 | f3aa6c4 | Backend Laporan/PDF dan dependensi Dompdf — DALAM PENGEMBANGAN. |
+| 16 | **15e32bc** | Paket integrasi portal 34 path (19 A, 15 M): route/layout/navigasi, Blade operasional, Bootstrap/legacy, README dan contoh MySQL. Snapshot diuji terisolasi dengan SQLite; belum final. |
 
-**Belum seluruhnya tersedia pada remote checkpoint tersebut:** route operasional lintas fitur, aktivasi layout/sidebar/topbar Bootstrap, Blade utama Dashboard/CRUD/keuangan beserta partial lokal yang diperlukan, integrasi API/Postman, pemindahan arsip SQL historis dan dokumentasi terbaru. Backend modul keuangan, fondasi aset, komponen persiapan dan Login/error sudah tercatat, tetapi bukan berarti portal lengkap telah aktif. Beberapa file bersama masih berupa diff terhadap checkpoint, sementara file lainnya untracked. Memiliki source fitur di working tree tidak otomatis membuatnya ikut push. Tautan source/dokumen dalam README mengacu pada working tree dan belum semuanya tersedia pada checkpoint remote.
+**Sudah tersedia pada 15e32bc:** route asli portal kedua role, lima route CRUD Anggota, layout Bootstrap/legacy, sidebar/topbar, Dashboard, halaman keuangan/partial/preview, aset pendukung, backend/domain/migration/seeder, Login/error, Composer/npm lockfile dan contoh konfigurasi MySQL. Sembilan named route sidebar yang dahulu tertunda kini sudah terdaftar; informasi lama “CRUD/layout belum committed” tidak berlaku untuk checkpoint ini.
 
-Sembilan named route lintas fitur yang masih tertunda pada snapshot portal Git: admin.anggota, admin.iuran, admin.verifikasi, admin.transaksi, admin.laporan, admin.transparansi, anggota.tagihan, anggota.laporan, anggota.transparansi. **Working tree saat ini mempunyai implementasi route tersebut**, tetapi checkpoint terdahulu belum semuanya memuatnya. Sidebar/dashboard clone dapat terkena RouteNotFoundException sampai integrasi aslinya selesai. Backend-only commit bukan klaim aplikasi mandiri siap demo.
+**Belum ikut checkpoint:** registrasi/implementasi API JSON, Postman, sebagian suite regresi dan runner visual, pemindahan arsip SQL historis serta dokumen tahap lokal. Penambahan itu tetap dipertahankan untuk review/integrasi berikutnya, bukan diam-diam dihapus. Main belum menerima paket portal terbaru; branch integrasi bukan rilis production.
 
-Prioritas integrasi sekarang adalah **kelompok dependensi yang membuat hasil clone konsisten**, bukan memaksakan setiap komponen kecil menjadi commit mandiri. Pertahankan semua fitur dan desain, review route/layout/Blade/aset bersama, lalu buktikan instalasi baru serta login, navigasi, CRUD Anggota, validasi, 403 dan logout pada lingkungan terisolasi. Uji branch lengkap sebelum PR/main/tag. Setiap staging, commit dan push memerlukan persetujuan Jovan; jangan ubah identitas author/committer, merekayasa tanggal/kontribusi, force push atau menimpa pekerjaan anggota lain. README ini tidak memberi izin operasi Git dan belum menyatakan hasil clone siap.
+<a id="distribusi-checkpoint"></a>
+
+### Isi paket integrasi yang sudah dipush
+
+Commit [15e32bc](https://github.com/Jopannnnnn/KasOrg/commit/15e32bc76f780dbd0560f3d8c58aae029e5966e4) memuat **34 path: 19 ditambahkan dan 15 dimodifikasi**. Pengelompokan berikut menjelaskan cakupannya, bukan daftar file baru yang masih harus dibuat:
+
+| Kelompok dalam commit | Jumlah path | Isi dan fungsi |
+| --- | --- | --- |
+| Route dan layout | 4 | [routes/web.php](routes/web.php) operasional, [layouts/app](resources/views/layouts/app.blade.php), serta wrapper [sidebar](resources/views/components/sidebar.blade.php) dan [topbar](resources/views/components/topbar.blade.php). Named route portal asli, session pengguna dan pemilihan Bootstrap/legacy sudah masuk. |
+| Halaman utama MVP | 3 | [Dashboard Admin](resources/views/admin/dashboard.blade.php), [Dashboard Anggota](resources/views/anggota/dashboard.blade.php), dan [Data Anggota](resources/views/admin/anggota/index.blade.php). Form CRUD terhubung ke backend yang committed sebelumnya. |
+| Halaman operasional keuangan | 6 | Input Iuran, Verifikasi Pembayaran, Transaksi Kas, Tagihan Anggota, Laporan dan Transparansi. Halaman tetap tersedia dengan status DALAM PENGEMBANGAN/TESTING; bukan bukti seluruh alurnya sudah lulus. |
+| Jenis Iuran Bootstrap | 4 | CSS Jenis Iuran, Blade daftar/form, serta partial modal-scripts Bootstrap. |
+| Komponen keuangan | 4 | Modal legacy, filter, riwayat pembayaran dan script interaksi keuangan. |
+| Partial transaksi/laporan | 5 | Form transaksi, filter periode laporan, grafik laporan, alokasi pengeluaran dan tabel kas. |
+| Preview lokal | 6 | Preview Iuran, Verifikasi, Transaksi, Tagihan, Laporan dan Transparansi; hanya local, bukan autentikasi/CRUD operasional. |
+| Panduan instalasi | 2 | README dan [.env.example](.env.example) versi checkpoint; contoh MySQL, database baru kasorg_local dan dua variabel password demo kosong. Bukan .env aktif atau salinan data integrator. |
+| **Total** | **34** | Paket sudah dipush ke branch jovan/integrasi-laravel, bukan otomatis ke main. |
+
+Fondasi lain **sudah masuk commit sebelumnya**: backend/auth/Model/migration/seeder, aset serta komponen Bootstrap, CSS/pagination Anggota, halaman Login/error, Composer lockfile dan [package-lock.json](package-lock.json). File tersebut tidak semuanya berubah lagi dalam paket 34 path. Dengan demikian, pernyataan lama bahwa route/layout/lockfile/CRUD masih belum tersedia di GitHub **tidak berlaku pada checkpoint ini**.
+
+### Yang tidak otomatis diperoleh dari clone checkpoint ini
+
+| Kelompok | Kondisi GitHub 15e32bc vs working tree integrator | Dampak bagi anggota |
+| --- | --- | --- |
+| Web, login, dashboard dan CRUD Anggota | Source runtime sudah committed; audit dependensi tidak menemukan file P0 tertinggal. | **Layak dicoba melalui fresh clone dan pengujian MySQL**, bukan sudah dinyatakan lulus MySQL di laptop teman. Instalasi dependency, konfigurasi privat, migration/seeder database baru dan build tetap diperlukan. |
+| API JSON | routes/api.php, KasController, EnsureApiJson, dua Request, ApiResponse, serta perubahan registrasi/exception pada bootstrap/app.php masih lokal. | Dua endpoint API belum tersedia pada clone; integrasikan ketujuh path yang saling bergantung sebelum menjalankan tutorial API. Jangan mengambil bootstrap/app.php lokal sendirian. |
+| Postman | Collection JSON, environment contoh, panduan dan representasi workspace YAML belum dipush. | Tidak ada collection KasOrg dari checkpoint ini. JSON utama dan environment contoh cukup untuk jalur impor; YAML adalah representasi pendamping, bukan endpoint tambahan. |
+| Suite otomatis | Test konfigurasi demo/scaffold dasar sudah tracked; suite Feature lengkap, helper dan runner tambahan masih lokal. | Hasil 45/45 adalah bukti pengujian sebelumnya, bukan jaminan menjalankan seluruh suite pada clone sekarang akan lulus. Baca [catatan assertion dan runner](#pengujian). |
+| Dokumen dan arsip historis | Dokumen tahap serta pemindahan SQL masih lokal; beberapa pedoman tracked memiliki revisi yang belum dipush. | Tautan ke path tracked membuka versi checkpoint, bukan revisi lokal terbaru. Path lokal tanpa tautan bukan syarat boot dan jangan dianggap hilang karena instalasi gagal. |
+
+README pada commit 15e32bc sudah tersedia di GitHub. Penyempurnaan README setelah checkpoint itu tetap **perubahan lokal sampai mendapat persetujuan commit/push tersendiri**; dokumentasi ini tidak mengubah checkpoint aplikasi atau mengirim file tambahan secara otomatis.
+
+### Git untuk anggota kelompok
+
+- **Commit** menyimpan snapshot perubahan terpilih di repository lokal; **push** mengirim commit ke GitHub. File yang belum committed tidak otomatis ikut push.
+- **main** adalah tujuan integrasi kelompok/penyerahan yang harus ditinjau dan diuji; **jovan/integrasi-laravel** menampung integrasi pengembangan yang sekarang dapat dicoba sesuai batas bukti di atas.
+- Pilih branch saat clone seperti tutorial XAMPP/Laragon. Jangan mengganti judul/scope atau mengubah atribusi/identitas author untuk menambah jumlah kontribusi.
+- **Pull Request (PR)** adalah permintaan review untuk menggabungkan branch. Belum langsung merge ke main karena pengujian MySQL, integrasi API, regresi dan deliverable UTS belum seluruhnya selesai. Main/tag mvp-rc memerlukan keputusan serta pengujian kelompok tersendiri.
+
+**Mengambil update di laptop anggota, hanya setelah koordinasi:**
+
+~~~powershell
+git status --short
+git branch --show-current
+git rev-parse HEAD
+~~~
+
+Jika status menunjukkan perubahan lokal, **STOP**: review/simpan pekerjaan bersama tim dahulu; jangan menimpa, reset, restore, clean atau stash otomatis. Jika working tree bersih dan branch sudah jovan/integrasi-laravel, setelah izin mengambil update:
+
+~~~powershell
+git fetch origin
+git log --oneline --max-count=5 origin/jovan/integrasi-laravel
+git pull --ff-only origin jovan/integrasi-laravel
+~~~
+
+Fetch memperbarui informasi remote; pull --ff-only hanya maju jika histori memungkinkan. Jika ditolak/divergen, hentikan dan koordinasikan, **bukan** force push/rebase/merge otomatis. Setelah update, baca perubahan dependency/schema; Composer install/npm ci/build dilakukan sesuai kebutuhan, sedangkan migration/seeder existing tidak dijalankan sembarangan. Jangan menyalin .env orang lain.
+
+Setiap staging, commit, push, PR/merge atau perubahan data tim tetap perlu persetujuan yang sesuai. Fokus berikutnya adalah uji MySQL di mesin anggota serta API terpisah, bukan memaksakan commit kecil yang membuat snapshot tidak konsisten. Tidak ada operasi Git tulis dalam tugas pembaruan README ini.
 
 Atribusi dan bukti kontribusi harus sesuai pekerjaan sebenarnya: Refan UI/UX, Kent rancangan awal, Jovan integrasi; kontribusi dokumentasi/QA anggota lain dicatat dari bukti yang tersedia. Jangan menyimpulkan kontribusi hanya dari author satu commit besar atau membuat co-author yang tidak sesuai.
 
@@ -1262,16 +1492,18 @@ Atribusi dan bukti kontribusi harus sesuai pekerjaan sebenarnya: Refan UI/UX, Ke
 - Laporan/PDF memakai data saat request dan periode terpilih, maksimal 2.000 transaksi untuk PDF; bukan arsip beku. Perubahan transaksi antara membuka HTML dan meminta PDF bisa mengubah isinya.
 - Bootstrap belum seluruh halaman; font/ikon masih eksternal. Clean clone, E2E seluruh fitur setelah Bootstrap, pengujian GUI Postman terbaru, locking MariaDB multiproses serta deliverable main/tag/PR tidak boleh dinyatakan lulus hanya dari README/fixture/build.
 
-### Rujukan yang benar-benar tersedia
+### Rujukan — bedakan yang tersedia di branch dan yang masih lokal
+
+Tautan di bawah hanya menunjuk path yang sudah tercatat pada checkpoint. Jika file tracked juga diubah secara lokal, pembaca GitHub memperoleh versi checkpoint, bukan otomatis versi lokal terbaru. Path dokumen tanpa tautan adalah catatan lokal yang belum dipush; disebut untuk menjaga konteks, **bukan syarat instalasi dan bukan tautan yang seharusnya tersedia pada clone**.
 
 - Persyaratan: [ketentuan UTS](docs/referensi-dosen/Ketentuan-UTS-PWL.pdf), [kontrak kuliah](docs/referensi-dosen/Modul-01-Kontrak-Kuliah.pdf), [requirements/UIUX](docs/referensi-dosen/Modul-02-Requirements-UIUX.pdf), [Requirement Kelompok 4 DRAFT](docs/referensi-dosen/Requirement-KasOrg-Kelompok4-DRAFT.pdf), [checklist](docs/KASORG_UTS_CHECKLIST.md), [roadmap](docs/KASORG_ROADMAP_16_MINGGU.md).
 - Memulai konteks: [AGENTS.md](AGENTS.md), [CODEX_START_HERE](docs/CODEX_START_HERE.md). Keduanya panduan, bukan bukti fitur selesai.
-- Database: [setup development](docs/SETUP_DATABASE_DEVELOPMENT.md), [draft skema](docs/DRAFT_SKEMA_DATABASE_LARAVEL.md), [review Kent](docs/REVIEW_DATABASE_BERSAMA_KENT.md), [penyelarasan G1](docs/PENYELARASAN_DATABASE_G1.md), [data demo](docs/DATA_DEMO_UTS.md).
-- Implementasi: [auth](docs/AUTENTIKASI_TAHAP_4A.md), [CRUD Anggota](docs/CRUD_ANGGOTA_TAHAP_5A.md), [Jenis Iuran](docs/CRUD_JENIS_IURAN_TAHAP_5D4A.md), [integrasi tagihan](docs/VERIFIKASI_JENIS_IURAN_TAGIHAN_5D4A_1.md), [pembayaran ulang](docs/PEMBAYARAN_ULANG_TAHAP_5B.md), [scope pembayaran](docs/KASORG_SCOPE_PEMBAYARAN.md).
-- Keuangan: [transaksi manual](docs/CRUD_TRANSAKSI_TAHAP_5D3.md), [Dashboard/Transparansi](docs/INTEGRASI_DASHBOARD_TAHAP_5D2.md), [Laporan/PDF](docs/LAPORAN_KEUANGAN_TAHAP_5D4B.md).
-- API/frontend: [API Tahap 6A](docs/API_TAHAP_6A.md), [Postman terbaru](postman/README.md), [migrasi Bootstrap](docs/MIGRASI_BOOTSTRAP_MVP.md), [audit UTS](docs/AUDIT_FINAL_UTS_KASORG.md).
+- Database: `docs/SETUP_DATABASE_DEVELOPMENT.md`, `docs/DRAFT_SKEMA_DATABASE_LARAVEL.md`, `docs/REVIEW_DATABASE_BERSAMA_KENT.md`, `docs/PENYELARASAN_DATABASE_G1.md`, `docs/DATA_DEMO_UTS.md`.
+- Implementasi: `docs/AUTENTIKASI_TAHAP_4A.md`, `docs/CRUD_ANGGOTA_TAHAP_5A.md`, `docs/CRUD_JENIS_IURAN_TAHAP_5D4A.md`, `docs/VERIFIKASI_JENIS_IURAN_TAGIHAN_5D4A_1.md`, `docs/PEMBAYARAN_ULANG_TAHAP_5B.md`, [scope pembayaran](docs/KASORG_SCOPE_PEMBAYARAN.md).
+- Keuangan: `docs/CRUD_TRANSAKSI_TAHAP_5D3.md`, `docs/INTEGRASI_DASHBOARD_TAHAP_5D2.md`, `docs/LAPORAN_KEUANGAN_TAHAP_5D4B.md`.
+- API/frontend: `docs/API_TAHAP_6A.md`, `postman/README.md`, `docs/MIGRASI_BOOTSTRAP_MVP.md`, `docs/AUDIT_FINAL_UTS_KASORG.md`.
 - [panduan.md](docs/panduan.md) milik anggota dokumentasi masih catatan awal, bukan pengganti panduan instalasi/laporan UTS lengkap.
 
-Dokumen tahap/checklist adalah snapshot historis. Contohnya, audit mendahului error 404/500 kustom, panduan migrasi mendahului build sukses, dan catatan API awal menyebut jumlah assertion lama. Gunakan source aktual, panduan Postman tersinkron serta bukti tahap yang sesuai; jangan mengubah scope atau menganggap rencana penghapusan SQL sudah dilaksanakan.
+Dokumen tahap/checklist adalah snapshot historis. Contohnya, audit mendahului error 404/500 kustom, panduan migrasi mendahului build sukses, dan checklist/catatan API awal masih menyebut 50 assertion serta beberapa status lama. Panduan Postman lokal tersinkron mencatat 51 assertion historis, tetapi file API/Postman tersebut belum tersedia pada clone. Gunakan source aktual dan bukti tahap yang sesuai; jangan menganggap checklist lama, rencana penghapusan SQL atau hasil pada working tree sebagai kondisi GitHub terbaru.
 
-**Batas pembaruan README:** hanya pembacaan source/metadata dan validasi dokumentasi. Tidak membuka .env, mengakses MariaDB, menjalankan migration/seeder/build/test/browser, membuat file Temp, atau melakukan Git write. Sebelum teman mendemokan hasil clone, verifikasi revisi/source lengkap, instalasi database baru yang disetujui, build kedua jalur aset, login/CRUD/403/logout nyata, Postman GUI, serta responsivitas pada mesinnya. Semua perubahan aplikasi, SQL historis, tes dan data existing tetap dipertahankan.
+**Batas pembaruan ini:** edit hanya README.md berdasarkan source/metadata dan hasil uji yang sudah tersedia. Tidak membuka .env aktif, mengakses MariaDB, menjalankan migration/seeder/build/test/browser, membuat file Temp, atau melakukan staging/commit/push. Sebelum demo pada laptop anggota, isi checklist instalasi dan uji MySQL secara nyata. Paket SQLite merupakan kemajuan yang terbukti, bukan pengganti pengujian MySQL, integrasi API, PR/main/tag atau kesiapan production.
