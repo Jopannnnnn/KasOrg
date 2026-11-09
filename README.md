@@ -6,7 +6,7 @@ KasOrg mengurangi pencatatan anggota/iuran yang tersebar, kesulitan memeriksa pe
 
 **Atribusi:** Refan merancang dan mengembangkan prototype frontend PHP native; Kent merancang database awal; Jovan mengintegrasikan frontend, database, dan backend ke Laravel. Prototype di `bootstrap/*.php` tetap menjadi acuan desain. Adaptasi Laravel/Bootstrap tidak menghapus hak desain atau menjadikannya desain baru integrator. Kontribusi anggota lain mengikuti pekerjaan serta bukti Git kelompok yang sebenarnya, bukan diasumsikan oleh README ini.
 
-> **Checkpoint 9 November 2026:** branch lokal dan GitHub `jovan/integrasi-laravel` berada di **`15e32bc76f780dbd0560f3d8c58aae029e5966e4`**. Paket 34 path portal sudah dipush: route, layout, sidebar/topbar dan Blade operasional tersedia bersama backend, migration, model, seeder dan autentikasi. Snapshot sumber yang sama telah diuji terisolasi dengan SQLite, **bukan** fresh clone MySQL/MariaDB di laptop teman. API/Postman masih lokal dan belum termasuk paket clone ini.
+> **Checkpoint 9 November 2026:** branch lokal dan GitHub `jovan/integrasi-laravel` berada di **`ad03cc52e21ee8d2a0a7fa0f70071d36024b91fc`**. Paket portal 34 path pada `15e32bc`, pembaruan README pada `2e001ba`, dan paket API/Postman **10 path (9 A, 1 M)** pada `ad03cc5` sudah dipush. Fresh clone branch ini memperoleh source web dan API, collection JSON, environment contoh serta panduan Postman. Bukti pengujian portal dan API memakai SQLite terisolasi, **bukan** fresh clone MySQL/MariaDB atau Postman GUI di laptop teman. Status tetap **DALAM PENGEMBANGAN — BELUM FINAL**.
 
 <a id="mulai-cepat"></a>
 
@@ -19,12 +19,12 @@ Pilih satu jalur. Panduan ini untuk **dibaca lalu dilakukan secara manual di kom
 | Memakai XAMPP, belum ada instalasi/database | [Tutorial XAMPP dari clone sampai login](#xampp). |
 | Memakai Laragon, belum ada instalasi/database | [Tutorial Laragon dari clone sampai login](#laragon). |
 | Sudah punya database KasOrg dan konfigurasi lokal | [Menjalankan instalasi existing](#existing); jangan generate key atau seed ulang. |
-| Ingin mencoba API JSON | Baca [status API/Postman](#postman): belum tersedia pada checkpoint clone ini; tutorialnya bersyarat untuk integrasi berikutnya. |
+| Ingin mencoba API JSON | Setelah instalasi lokal siap, impor dua JSON dari repository dan ikuti [tutorial API/Postman](#postman) serta [panduan Runner](postman/README.md). |
 | Ingin memahami kode untuk presentasi | [Peta file](#peta-file) → [empat alur MVC](#alur-kode) → [cara belajar UTS](#belajar-uts). |
 
-Urutan instalasi baru: **buka VS Code → Terminal PowerShell → pilih folder XAMPP/Laragon → clone branch → buka folder KasOrg → Composer → konfigurasi privat → database MySQL baru kosong → APP_KEY baru → migration/seeder → npm ci + build Vite → server → login dua role → uji CRUD Anggota**. Postman menyusul setelah paket API terintegrasi. Tutorial XAMPP/Laragon menjelaskan tujuan, hasil yang diharapkan dan tindakan saat gagal; perintahnya tidak dijalankan dalam pembaruan dokumentasi ini.
+Urutan instalasi baru: **buka VS Code → Terminal PowerShell → pilih folder XAMPP/Laragon → clone branch → buka folder KasOrg → Composer → konfigurasi privat → database MySQL baru kosong → APP_KEY baru → migration/seeder → npm ci + build Vite → server → login dua role → uji CRUD Anggota → impor collection dan environment Postman → jalankan 13 request**. Tutorial XAMPP/Laragon menjelaskan tujuan, hasil yang diharapkan dan tindakan saat gagal; perintahnya tidak dijalankan dalam pembaruan dokumentasi ini.
 
-**Batas bukti:** instalasi dependency/build, 11 migration, seeder dan **45/45 pemeriksaan HTTP/database** berhasil pada ekspor Git index ke folder terpisah dengan SQLite. Route operasional portal dan CRUD Anggota kini committed. **Instalasi MySQL/MariaDB serta fresh clone aktual di laptop anggota belum diuji**; ikuti [skenario manual](#uji-crud) dan catat hasil sendiri. Modul keuangan masih pengembangan/testing, API/Postman perlu integrasi terpisah, dan paket terbaru belum digabung ke main.
+**Batas bukti:** paket portal lulus instalasi dependency/build, 11 migration, seeder dan **45/45 pemeriksaan HTTP/database** dengan SQLite terisolasi. Paket API lulus **15 tes / 148 assertions**, **13 request Postman CLI / 51 assertions**, dan **20/20 pemeriksaan HTTP tambahan**, juga dengan SQLite terisolasi. Kedua tahap ini berbeda; angkanya tidak digabung menjadi hasil regresi penuh. **Fresh clone MySQL/MariaDB, Postman GUI laptop anggota dan seluruh regresi belum dinyatakan lulus**; ikuti [skenario manual](#uji-crud), [panduan Postman](postman/README.md) dan catat hasil sendiri. Modul keuangan masih pengembangan/testing; paket terbaru belum digabung ke main.
 
 ## Daftar isi
 
@@ -41,7 +41,7 @@ Urutan instalasi baru: **buka VS Code → Terminal PowerShell → pilih folder X
 - [11. Hasil pengujian](#hasil-uji), [16 skenario CRUD manual](#uji-crud), [checklist laptop anggota](#checklist-laptop), dan [belajar/demo UTS](#belajar-uts)
 - [12. Troubleshooting](#troubleshooting)
 - [13. Status GitHub dan kerja kelompok](#status-github)
-- [Isi paket 34 path dan file yang masih lokal](#distribusi-checkpoint)
+- [Distribusi paket portal 34 path, API/Postman 10 path, dan file yang masih lokal](#distribusi-checkpoint)
 - [14. Batas fitur dan dokumentasi lanjutan](#batas)
 
 <a id="status"></a>
@@ -60,7 +60,7 @@ Urutan instalasi baru: **buka VS Code → Terminal PowerShell → pilih folder X
 | Database | MySQL/MariaDB; komputer integrasi memakai **`kasorg_dev` pada MariaDB 10.4 XAMPP**. |
 | Aset | Vite, plugin Laravel, Node.js/npm; package-lock.json kini tersedia. Vite terkunci **7.3.7**. |
 | PDF | `barryvdh/laravel-dompdf` **v3.1.2** pada composer.lock untuk unduhan laporan keuangan. |
-| Pengujian | PHPUnit **11.5.57** tersedia sebagai dependency. Snapshot portal diuji HTTP/browser dengan SQLite file terisolasi; suite regresi lengkap/runner frontend dan collection Postman masih lokal, bukan seluruhnya ikut clone. |
+| Pengujian | PHPUnit **11.5.57** tersedia sebagai dependency. Portal dan API diuji terpisah memakai SQLite terisolasi. Collection JSON, environment contoh dan README Postman sudah ikut clone; suite regresi lengkap/helper/runner frontend belum ikut. |
 
 Versi tersebut dibaca dari source/lockfile lokal, bukan jaminan setiap versi server atau komputer teman telah diuji. **Blade adalah template engine, Bootstrap adalah framework CSS/JS antarmuka, dan PHP tetap digunakan untuk Controller/Model/Request/Migration/Test.** Migrasi CSS tidak mengubah bahasa backend.
 
@@ -96,7 +96,7 @@ CRUD Data Anggota adalah **fitur utama demo UTS**. “Tersedia” berarti source
 | Transparansi | Melihat informasi organisasi | Melihat informasi organisasi yang diizinkan | Service bersama, filter, alokasi dan tabel tanpa bukti transfer pribadi. | Halaman kedua role dibuka; pengujian finansial lengkap belum dilakukan. |
 | Laporan / PDF | Lihat/unduh sesuai periode | Lihat/unduh sesuai izin | Service bersama dan Dompdf, bukan notifikasi unduh palsu. | Halaman dibuka; render/unduh PDF aktual belum termasuk pengujian paket. |
 | Error 403/404/500 | Pesan Indonesia | Sama | Blade kustom mempertahankan status HTTP asli. | 403 dan 404 nyata diuji; error 500 aktual tidak sengaja dipicu. |
-| API JSON / Postman | Rencana akses session | Rencana akses sesuai role | **Source lokal, belum committed/push**; belum tersedia pada clone checkpoint ini. | Bukti API historis terpisah, **bukan** bagian 45/45 atau bukti endpoint tersedia pada clone. |
+| API JSON / Postman | Dua GET melalui session; collection memakai Admin | Dua GET sesuai role, tanpa akses Dashboard Admin | **Sudah committed/dipush pada ad03cc5**: 7 path API dan 3 file Postman; tersedia pada clone branch ini. | SQLite terisolasi: 15 tes/148 assertions; CLI 13 request/51 assertions; HTTP tambahan 20/20. Bukan bagian 45/45 portal atau bukti MySQL/GUI laptop anggota lulus. |
 
 Modul keuangan tetap **DALAM PENGEMBANGAN / TESTING**, bukan dihapus atau diganti placeholder. `/ui-preview/*` hanya aktif pada environment local, memakai mock dan tidak menyediakan autentikasi/CRUD sungguhan. Status iuran Data Anggota, badge sidebar dan notifikasi tertentu masih simulasi/belum terhubung.
 
@@ -104,8 +104,8 @@ Modul keuangan tetap **DALAM PENGEMBANGAN / TESTING**, bukan dihapus atau digant
 
 | Istilah | Makna | Bukan berarti |
 | --- | --- | --- |
-| Committed/dipush | Source tercatat sampai 15e32bc pada branch integrasi. | Sudah masuk main/tag rilis atau production-ready. |
-| Working tree lokal | Ada tambahan API, Postman, test dan dokumentasi yang belum dipush. | Tambahan itu otomatis ikut clone. |
+| Committed/dipush | Source web dan API/Postman tercatat sampai ad03cc5 pada branch integrasi. | Sudah masuk main/tag rilis atau production-ready. |
+| Working tree lokal | Ada suite test/helper, runner, workspace YAML Postman, dokumentasi dan arsip pindahan yang belum dipush. | Tambahan itu otomatis ikut clone atau wajib untuk menjalankan API. |
 | Fixture frontend | Geometri/interaksi pada HTML/data buatan terisolasi. | Login HTTP atau MySQL telah diuji. |
 | Paket SQLite terisolasi | Dependency, migration asli, seeder, HTTP dan browser pada salinan index dengan database baru. | Fresh clone laptop teman atau perilaku ENUM/DECIMAL/locking MySQL telah lulus. |
 
@@ -123,7 +123,7 @@ Modul keuangan tetap **DALAM PENGEMBANGAN / TESTING**, bukan dihapus atau digant
 | Server database | XAMPP atau Laragon dengan MySQL/MariaDB; buat database lokal baru kosong. |
 | Node.js + npm | Node **`^20.19.0` atau `>=22.12.0`** untuk Vite 7.3.7; pengujian memakai Node 22.23.4/npm 10.9.9. |
 | Browser | Chrome/Edge/Firefox modern; Chrome headless dipakai pada uji paket. |
-| Postman | Untuk tahap API **setelah integrasinya tersedia**, bukan syarat membuka CRUD checkpoint ini. |
+| Postman | Untuk menguji dua endpoint yang sudah ikut branch melalui collection JSON 13 request; bukan syarat membuka CRUD. |
 | Internet / izin | Dependency, font/ikon/CDN; PHP dapat menulis storage dan bootstrap/cache instalasinya sendiri. |
 
 - Ekstensi PHP: **BCMath**, PDO dan **pdo_mysql**, Ctype, cURL, DOM, Fileinfo, Filter, Hash, Iconv, JSON, Libxml, Mbstring, OpenSSL, PCRE, Session, Tokenizer dan XML. Sebagian merupakan bawaan PHP. Untuk pengujian SQLite diperlukan **pdo_sqlite**; ekstensi SQLite3 terpisah hanya bila runner memerlukannya. XMLWriter diperlukan dependency test. GD disarankan untuk gambar PDF; ZIP/alat ekstraksi membantu Composer.
@@ -190,7 +190,7 @@ Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksa
    Set-Location 'C:\xampp\htdocs\KasOrg'
    ~~~
 
-   **Hasil:** root proyek memiliki artisan, composer.json dan resources/. **Jika gagal:** periksa akses GitHub, nama branch, jaringan, dan apakah folder KasOrg sudah ada. Jangan hapus folder existing. Checkpoint paket portal adalah **15e32bc**; API/Postman belum ikut. Periksa branch dan HEAD dengan `git branch --show-current` serta `git rev-parse HEAD`, bukan menganggap main sudah sama.
+   **Hasil:** root proyek memiliki artisan, composer.json dan resources/. **Jika gagal:** periksa akses GitHub, nama branch, jaringan, dan apakah folder KasOrg sudah ada. Jangan hapus folder existing. Checkpoint terbaru **ad03cc5** memuat portal dan API/Postman. Periksa branch dan HEAD dengan `git branch --show-current` serta `git rev-parse HEAD`, bukan menganggap main sudah sama.
 
 3. **Buka VS Code dan terminal pada root.** Tujuan: supaya perintah menemukan artisan dan dependency yang benar.
 
@@ -202,7 +202,7 @@ Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksa
    git rev-parse HEAD
    ~~~
 
-   **Hasil:** folder aktif C:\xampp\htdocs\KasOrg, Test-Path menghasilkan True, branch jovan/integrasi-laravel dan HEAD 15e32bc76f780dbd0560f3d8c58aae029e5966e4 (atau pembaruan berikutnya yang disepakati). **Jika gagal:** pilih File → Open Folder secara manual bila command code belum tersedia; pilih Terminal → New Terminal → PowerShell, lalu Set-Location ke root proyek.
+   **Hasil:** folder aktif C:\xampp\htdocs\KasOrg, Test-Path menghasilkan True, branch jovan/integrasi-laravel dan HEAD ad03cc52e21ee8d2a0a7fa0f70071d36024b91fc (atau pembaruan berikutnya yang disepakati). **Jika gagal:** pilih File → Open Folder secara manual bila command code belum tersedia; pilih Terminal → New Terminal → PowerShell, lalu Set-Location ke root proyek.
 
 4. **Pasang dependency PHP.** Tujuan: menyediakan Laravel, autoload dan library sesuai lockfile.
 
@@ -276,7 +276,9 @@ Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksa
 
 12. **Coba dua role dan CRUD Anggota pada data uji.** Tujuan: memastikan integrasi, bukan sekadar halaman tampil. Login dengan email [akun demo](#akun-demo) dan password privat yang baru disiapkan; Admin seharusnya ke Dashboard Admin, Anggota ke Dashboard Anggota. Logout di antara pergantian akun. Gunakan [skenario demo](#pengujian) dengan anggota uji terpisah bila operasi tulis telah disetujui; jangan mengubah akun demo utama.
 
-    **Perintah/aksi:** ikuti [16 skenario CRUD](#uji-crud) melalui browser pada http://127.0.0.1:8000, bukan URL phpMyAdmin. **Hasil yang perlu dibuktikan:** CRUD tersimpan, validasi menolak input salah, Anggota ke Admin mendapat 403 dan logout mengakhiri sesi. **Jika gagal:** lihat [troubleshooting](#troubleshooting), lalu laporkan ke kelompok. API/Postman belum dapat didemokan dari checkpoint ini. Ini rencana verifikasi MySQL di mesin teman, bukan hasil yang sudah lulus.
+    **Perintah/aksi:** ikuti [16 skenario CRUD](#uji-crud) melalui browser pada http://127.0.0.1:8000, bukan URL phpMyAdmin. **Hasil yang perlu dibuktikan:** CRUD tersimpan, validasi menolak input salah, Anggota ke Admin mendapat 403 dan logout mengakhiri sesi. **Jika gagal:** lihat [troubleshooting](#troubleshooting), lalu laporkan ke kelompok. Ini rencana verifikasi MySQL di mesin teman, bukan hasil yang sudah lulus.
+
+13. **Uji API dari paket repository.** Tujuan: menguji session/JSON pada instalasi MySQL sendiri. Di terminal kedua, periksa `php artisan route:list --path=api`; kedua endpoint pada [bagian API](#postman) seharusnya terdaftar. Impor [collection](postman/KasOrg-UTS.postman_collection.json) dan [environment contoh](postman/KasOrg-Local.example.postman_environment.json) ke Postman, isi kredensial Admin hanya secara privat, lalu ikuti [13 request berurutan](postman/README.md). **Hasil yang diharapkan:** 13 request/51 assertions tanpa kegagalan; catat hasil aktual. Browser login tidak berbagi sesi dengan Postman. **Jika gagal:** periksa revisi, server/base_url, cookie dan CSRF; jangan seed ulang/reset database. Keberhasilan di laptop anggota masih perlu dibuktikan.
 
 <a id="laragon"></a>
 
@@ -306,7 +308,7 @@ Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksa
    Set-Location 'C:\laragon\www\KasOrg'
    ~~~
 
-   **Hasil:** artisan, composer.json dan resources/ ada. **Jika gagal:** cek jaringan/akses branch/folder existing; jangan gunakan Quick App untuk membuat proyek baru atau menghapus pekerjaan lama. Gunakan checkpoint portal **15e32bc** pada branch integrasi, bukan menganggap main sudah sama. API/Postman tetap [belum terintegrasi](#postman).
+   **Hasil:** artisan, composer.json dan resources/ ada. **Jika gagal:** cek jaringan/akses branch/folder existing; jangan gunakan Quick App untuk membuat proyek baru atau menghapus pekerjaan lama. Gunakan checkpoint **ad03cc5** pada branch integrasi, yang sudah memuat portal dan [API/Postman](#postman), bukan menganggap main sudah sama.
 
 3. **Buka VS Code dan terminal.** Tujuan: menjalankan perintah pada root yang benar.
 
@@ -380,9 +382,11 @@ Jika terminal belum mengenali PHP, Composer, Git atau Node, selesaikan pemeriksa
 
     **Hasil:** http://127.0.0.1:8000/login terbuka dan MySQL tetap berjalan. **Jika gagal:** cek port 8000, key, izin runtime, dependency dan server database. Apache/Nginx Laragon tidak diperlukan untuk Artisan; jangan menganggap tombol Start All saja sudah menjalankan Artisan.
 
-12. **Login dua role dan uji CRUD Anggota.** Tujuan: memverifikasi hasil instalasi sendiri. Gunakan email [demo](#akun-demo) dan password privat; logout saat berpindah akun. Ikuti [16 skenario CRUD](#uji-crud) untuk penyimpanan, validasi, status, arsip dan 403. API/Postman memerlukan integrasi berikutnya.
+12. **Login dua role dan uji CRUD Anggota.** Tujuan: memverifikasi hasil instalasi sendiri. Gunakan email [demo](#akun-demo) dan password privat; logout saat berpindah akun. Ikuti [16 skenario CRUD](#uji-crud) untuk penyimpanan, validasi, status, arsip dan 403.
 
     **Perintah/aksi:** form browser pada http://127.0.0.1:8000/login. **Hasil:** data tersimpan dan izin role sesuai; bukti SQL hanya dibaca pada database uji sendiri bila perlu memastikan arsip. **Jika gagal:** periksa revisi, session/cookie dan [troubleshooting](#troubleshooting). Tutorial ini **bukan klaim fresh clone Laragon/MySQL telah lulus uji**.
+
+13. **Impor dan jalankan Postman.** Tujuan: menguji dua API pada database Laragon milik sendiri, bukan memakai sesi browser. Di terminal kedua, periksa `php artisan route:list --path=api`; impor [collection JSON](postman/KasOrg-UTS.postman_collection.json) serta [environment contoh](postman/KasOrg-Local.example.postman_environment.json), isi Admin lokal secara privat, dan jalankan 01–13 sesuai [panduan Postman](postman/README.md). **Hasil yang diharapkan:** 13 request/51 assertions lulus; ini target, bukan bukti laptop teman sudah lulus. **Jika gagal:** tinjau base_url/port, cookie, CSRF dan parameter; jangan membuat endpoint palsu atau mengulang migration/seeder sebagai tebakan.
 
 **Alternatif virtual host Laragon:** hanya gunakan URL seperti http://kasorg.test bila Apache/Nginx aktif dan document root benar-benar **C:\laragon\www\KasOrg\public**, bukan root repository. Sesuaikan APP_URL/base_url Postman serta gunakan satu host/protokol selama session. Ketersediaan automatic virtual host tidak membuktikan document root aman; untuk pemula jalur Artisan di atas sudah cukup.
 
@@ -610,8 +614,8 @@ KasOrg/
 ├── app/
 │   ├── Http/Controllers/    Alur request → service/model → respons
 │   ├── Http/Requests/       Validasi server-side dan izin request
-│   ├── Http/Middleware/     Status akun, role, preview; tambahan API masih lokal
-│   ├── Http/Responses/      Envelope API, masih lokal/belum ikut clone
+│   ├── Http/Middleware/     Status akun, role, preview, dan format JSON API
+│   ├── Http/Responses/      Envelope JSON sukses/error API
 │   ├── Models/              Eloquent dan relasi tabel
 │   ├── Policies/            Otorisasi tindakan pada objek
 │   ├── Providers/           Registrasi policy/provider
@@ -628,9 +632,9 @@ KasOrg/
 │   ├── css/                Entry Bootstrap dan Tailwind Vite terpisah
 │   └── js/                 Entry JavaScript dan inisialisasi aset
 ├── public/                 Document root; css/ khusus dan build/ hasil Vite
-├── routes/                 web.php dan console.php; api.php masih lokal
+├── routes/                 web.php, api.php dan console.php sudah ikut clone
 ├── tests/                  Unit/Feature tersedia; suite/runner lengkap masih lokal
-├── postman/                Masih lokal: collection 13 request/environment
+├── postman/                Collection JSON 13 request, environment contoh dan README
 ├── docs/                   Referensi dosen tersedia; banyak dokumen tahap/arsip masih lokal
 ├── storage/                Session/cache/log/upload privat; bukan source publik
 ├── vendor/                 Dibuat composer install, tidak ikut clone; jangan diedit
@@ -650,7 +654,7 @@ KasOrg/
 
 ### Peta file inti — gunakan sebagai petunjuk membaca source
 
-**Legenda distribusi:** tautan relatif ke file/folder dipilih dari path yang sudah tercatat pada checkpoint branch; bukan sekadar ditemukan di laptop integrator. File tracked yang memiliki perubahan lokal tetap memiliki versi GitHub, tetapi isinya belum tentu sama dengan working tree. Path tanpa tautan untuk API, suite regresi/runner, arsip pindahan dan dokumen tahap berarti **masih lokal/belum dipush**, bukan file yang pasti ada setelah clone. `bootstrap/app.php` sudah ada, tetapi perubahan registrasi API/exception JSON lokal belum ikut checkpoint. Peta mempertahankan konteks source lokal untuk integrasi berikutnya; lihat [ringkasan distribusi](#distribusi-checkpoint).
+**Legenda distribusi:** tautan relatif ke file/folder dipilih dari path yang tercatat pada checkpoint **ad03cc5**, bukan sekadar ditemukan di laptop integrator. File tracked yang memiliki perubahan lokal tetap memiliki versi GitHub, tetapi isinya belum tentu sama dengan working tree. Tujuh path API, termasuk registrasi/exception JSON pada `bootstrap/app.php`, serta tiga file utama Postman **sudah committed/dipush**. Path tanpa tautan untuk suite regresi/runner, arsip pindahan dan dokumen tahap berarti **masih lokal/belum dipush**, bukan file yang pasti ada setelah clone. Lihat [ringkasan distribusi](#distribusi-checkpoint).
 
 Tidak perlu menghafal semua file. Mulai dari URL yang dibuka, cari route-nya, ikuti Request/Policy, Controller, Model/Service, lalu Blade. Method adalah pekerjaan di dalam class; tabel ini menunjukkan nama **yang ada di source**, bukan fungsi baru yang harus dibuat.
 
@@ -670,7 +674,7 @@ Path pada kolom pertama relatif terhadap **app/Http/Controllers/**.
 | [PembayaranController.php](app/Http/Controllers/PembayaranController.php) | Menyimpan upload privat, menampilkan antrean, memverifikasi dan melayani bukti berizin. | store, index, verify, proof; hapus upload baru bila pengajuan gagal. | IuranService, Request/Policy pembayaran, disk bukti, Blade verifikasi/tagihan. |
 | [Admin/TransaksiKasController.php](app/Http/Controllers/Admin/TransaksiKasController.php) | Menerima aksi tulis kas manual; daftar bacanya tetap di RingkasanKasController. | store, update, destroy; redirect dengan pesan hasil. | Save/DeleteTransaksiKasRequest, TransaksiManualService, transaksi/form.blade.php. |
 | [LaporanController.php](app/Http/Controllers/LaporanController.php) | Menyiapkan laporan HTML dan unduhan PDF memakai hitungan yang sama. | __invoke, pdf, helper data; pagination HTML dan batas 2.000 transaksi PDF. | LaporanKeuanganRequest, RingkasanKasService, Dompdf, laporan/index dan pdf. |
-| `app/Http/Controllers/Api/KasController.php` | Mengembalikan kategori dan ringkasan organisasi, bukan data pribadi pengguna. | categories, summary; select kolom aman dan proyeksi saldo/grafik. | Request Api, KategoriTransaksi, RingkasanKasService, ApiResponse. |
+| [Api/KasController.php](app/Http/Controllers/Api/KasController.php) | Mengembalikan kategori dan ringkasan organisasi, bukan data pribadi pengguna. | categories, summary; select kolom aman dan proyeksi saldo/grafik. | Request Api, KategoriTransaksi, RingkasanKasService, ApiResponse. |
 
 ### 8.2. Form Request — memeriksa input sebelum disimpan
 
@@ -696,8 +700,8 @@ Path pada kolom pertama relatif terhadap **app/Http/Requests/**.
 | [Keuangan/VerifyPembayaranRequest.php](app/Http/Requests/Keuangan/VerifyPembayaranRequest.php) | Memeriksa keputusan Admin; wajib konfirmasi penerimaan atau alasan penolakan. | authorize, rules; disetujui/ditolak, bukan status bebas. | PembayaranIuranPolicy::verify, PembayaranController::verify. |
 | [Keuangan/SaveTransaksiKasRequest.php](app/Http/Requests/Keuangan/SaveTransaksiKasRequest.php) | Memeriksa nominal positif, jenis/kategori cocok, periode, tanggal dan keterangan. | authorize, rules, prepareForValidation; sumber/petugas/FK pembayaran ditetapkan server. | TransaksiKasPolicy, TransaksiKasController, TransaksiManualService. |
 | [Keuangan/DeleteTransaksiKasRequest.php](app/Http/Requests/Keuangan/DeleteTransaksiKasRequest.php) | Memerlukan izin dan checkbox konfirmasi sebelum soft delete kas. | authorize, rules, messages. | TransaksiKasPolicy::delete dan TransaksiKasController::destroy. |
-| `app/Http/Requests/Api/KategoriTransaksiRequest.php` | Menolak filter jenis kategori selain pemasukan/pengeluaran. | rules, attributes; nullable jenis. | Api/KasController::categories, KeuanganRequest. |
-| `app/Http/Requests/Api/RingkasanRequest.php` | Menolak periode API yang tidak valid/tidak ada. | rules; periode_id opsional, ID positif existing atau semua. | Api/KasController::summary, Periode, KeuanganRequest. |
+| [Api/KategoriTransaksiRequest.php](app/Http/Requests/Api/KategoriTransaksiRequest.php) | Menolak filter jenis kategori selain pemasukan/pengeluaran. | rules, attributes; nullable jenis. | Api/KasController::categories, KeuanganRequest. |
+| [Api/RingkasanRequest.php](app/Http/Requests/Api/RingkasanRequest.php) | Menolak periode API yang tidak valid/tidak ada. | rules; periode_id opsional, ID positif existing atau semua. | Api/KasController::summary, Periode, KeuanganRequest. |
 
 ### 8.3. Middleware — menyaring siapa yang boleh lewat
 
@@ -708,7 +712,7 @@ Path pada kolom pertama relatif terhadap **app/Http/Middleware/**.
 | [EnsureAccountIsActive.php](app/Http/Middleware/EnsureAccountIsActive.php) | Menghentikan sesi akun nonaktif/arsip meskipun sebelumnya sudah login. | handle; logout, invalidate dan pesan login. | Alias active di bootstrap/app.php, User::isAktif. |
 | [EnsureRole.php](app/Http/Middleware/EnsureRole.php) | Memastikan role session termasuk role yang diizinkan route. | handle; role salah menghasilkan 403. | Alias role, User::role, route portal/API. |
 | [EnsureLocalPreview.php](app/Http/Middleware/EnsureLocalPreview.php) | Menolak preview pada environment selain local. | handle; abort 404 jika bukan local. | Alias preview.local dan route ui-preview.*. |
-| `app/Http/Middleware/EnsureApiJson.php` | Memaksa respons API JSON dan mengubah redirect penolakan akun menjadi 403 JSON. | handle; menetapkan Accept JSON. | routes/api.php, ApiResponse, middleware active. |
+| [EnsureApiJson.php](app/Http/Middleware/EnsureApiJson.php) | Memaksa respons API JSON dan mengubah redirect penolakan akun menjadi 403 JSON. | handle; menetapkan Accept JSON. | routes/api.php, ApiResponse, middleware active. |
 
 Middleware **auth** dan **guest** berasal dari Laravel; tidak ada file custom Auth palsu. Alias middleware KasOrg serta exception JSON terdaftar di [bootstrap/app.php](bootstrap/app.php).
 
@@ -754,7 +758,7 @@ Path pada kolom pertama relatif terhadap **app/Services/**.
 | --- | --- | --- | --- |
 | [app/Support/DemoAccountProtection.php](app/Support/DemoAccountProtection.php) | Menandai identitas dua demo utama agar tidak terpakai ulang/diubah lewat CRUD. | protects; konstanta EMAILS/NIMS. | UserPolicy dan SaveAnggotaRequest. |
 | [app/Providers/AppServiceProvider.php](app/Providers/AppServiceProvider.php) | Mendaftarkan pemetaan otorisasi pengguna. | boot: Gate::policy(User, UserPolicy). | User dan UserPolicy. |
-| `app/Http/Responses/ApiResponse.php` | Membuat bentuk JSON sukses/gagal yang sama. | success, error; success/message/data/errors dan no-store. | KasController, EnsureApiJson, bootstrap/app.php. |
+| [app/Http/Responses/ApiResponse.php](app/Http/Responses/ApiResponse.php) | Membuat bentuk JSON sukses/gagal yang sama. | success, error; success/message/data/errors dan no-store. | KasController, EnsureApiJson, bootstrap/app.php. |
 
 ### 8.7. Migration — urutan pembentukan tabel dan FK
 
@@ -883,16 +887,16 @@ Path pada kolom pertama relatif terhadap **routes/**.
 | NAMA FILE | FUNGSI | METHOD/ISI PENTING | BERHUBUNGAN DENGAN FILE APA |
 | --- | --- | --- | --- |
 | [web.php](routes/web.php) | Memetakan URL halaman/form ke aksi dan pelindungnya. | GET/POST login, POST logout; auth/active/role; route CRUD dan preview local. | Controller, Request/Policy dan named route pada Blade. |
-| `routes/api.php` | Dua GET JSON session yang dapat diuji Postman. | /kategori-transaksi dan /transparansi/ringkasan; name api.*. | EnsureApiJson, KasController dan bootstrap/app.php. |
+| [api.php](routes/api.php) | Dua GET JSON session yang dapat diuji Postman. | /kategori-transaksi dan /transparansi/ringkasan; name api.*. | EnsureApiJson, KasController dan bootstrap/app.php. |
 | [console.php](routes/console.php) | Deklarasi command CLI scaffold. | Command inspire; bukan proses tutup buku. | Registrasi commands pada bootstrap/app.php. |
 
 | NAMA FILE | FUNGSI | METHOD/ISI PENTING | BERHUBUNGAN DENGAN FILE APA |
 | --- | --- | --- | --- |
-| [bootstrap/app.php](bootstrap/app.php) | Pada checkpoint mendaftarkan web/console/health, alias auth/active/role/preview dan redirect login. | withRouting, withMiddleware; tambahan API/exception JSON masih diff lokal. | routes/web.php dan middleware; ApiResponse belum tersedia pada clone. |
+| [bootstrap/app.php](bootstrap/app.php) | Mendaftarkan web/API/console/health, alias active/role/preview dan redirect login. | withRouting, withMiddleware, withExceptions; error API berstatus asli dan JSON disanitasi. | routes/web.php, routes/api.php, middleware dan ApiResponse yang sudah ikut clone. |
 | [vite.config.js](vite.config.js) | Mendaftarkan empat entry dan plugin build. | Plugin Laravel/Tailwind, input Bootstrap/legacy terpisah. | resources/css, resources/js dan manifest public/build. |
-| `postman/KasOrg-UTS.postman_collection.json` | Request HTTP dan pemeriksaan otomatis untuk demo API/session. | 13 request; script CSRF, cookie, status, privasi dan saldo. | routes/api.php, login/logout, Dashboard Admin. |
-| `postman/KasOrg-Local.example.postman_environment.json` | Template variabel kosong tanpa kredensial nyata. | base_url, email/password, periode_id, csrf_token, api_saldo_akhir. | Collection Postman dan environment privat pengguna. |
-| `postman/README.md` | Petunjuk rinci urutan Runner dan bukti sinkronisasi sebelumnya. | Redirect OFF, sesi aktif dan 13 request/51 assertions historis. | Tutorial Postman README ini. |
+| [postman/KasOrg-UTS.postman_collection.json](postman/KasOrg-UTS.postman_collection.json) | Request HTTP dan pemeriksaan otomatis untuk demo API/session. | 13 request; script CSRF, cookie, status, privasi dan saldo. | routes/api.php, login/logout, Dashboard Admin. |
+| [postman/KasOrg-Local.example.postman_environment.json](postman/KasOrg-Local.example.postman_environment.json) | Template tanpa kredensial nyata; base_url contoh dan nilai privat/runtime kosong. | base_url, email/password, periode_id, csrf_token, api_saldo_akhir. | Collection Postman dan environment privat pengguna. |
+| [postman/README.md](postman/README.md) | Panduan database lokal XAMPP/Laragon, session/CSRF, Runner dan batas bukti uji. | Redirect OFF, cookie aktif, 13 request/51 assertions; bukti SQLite dipisahkan dari pengujian MySQL/GUI yang belum dilakukan. | Tutorial Postman README ini. |
 
 ### 8.12. Tests — contoh perilaku yang seharusnya terjadi
 
@@ -982,6 +986,8 @@ Laravel memanggil authorize()/rules pada Form Request sebelum aksi Controller; P
 
 **Kedua SQL bukan database aktif, bukan sumber koneksi runtime, dan bukan installer resmi. Jangan diimpor ke database Laravel yang aktif.** Arsip mengandung DDL destruktif; komentar import lama di dalamnya tidak mengganti keputusan instalasi melalui migration.
 
+**Peringatan privasi arsip Kent:** audit sebelumnya menemukan data pengguna dan hash password pada SQL historis yang sudah memiliki versi di GitHub. Arsip tersebut berpotensi mengekspos data pribadi; jangan menganggap hash aman untuk dipublikasikan. Penanganannya memerlukan koordinasi pemilik data dan persetujuan kelompok secara terpisah, tanpa menghapus atribusi Kent. Pembaruan README ini **tidak membaca ulang, menampilkan data/hash, memindahkan, menghapus atau memublikasikan ulang SQL**. Jangan menyertakannya dalam paket instalasi/Postman atau mengimpor arsip untuk menyalin akun/data integrator.
+
 `tests/Unit/SkemaDatabaseKentTest.php` masih lokal/belum committed dan membaca SQL adaptasi **sebagai teks untuk pengujian statis** dan memeriksa keberadaan arsip Kent. Ini bukan eksekusi/import SQL. Rencana lama menghapus SQL adaptasi/melepas dependensi tes **belum dilakukan**; jangan menganggap rencana sebagai kondisi aktual atau menghapus arsip. Backup eksternal belum dikonfirmasi.
 
 ### Tabel aplikasi dan primary key
@@ -1045,11 +1051,11 @@ Tagihan belum dibayar serta pembayaran menunggu/ditolak **tidak menambah kas**. 
 
 <a id="postman"></a>
 
-## 10. API JSON dan Postman 13 request — panduan untuk integrasi berikutnya
+## 10. API JSON dan Postman 13 request
 
-**BELUM TERSEDIA DALAM CLONE 15e32bc.** `routes/api.php`, Controller/Request/response/middleware API, registrasi API pada `bootstrap/app.php`, serta collection/environment Postman masih lokal/belum committed. Checkpoint web dapat dipakai untuk login/CRUD, tetapi **dua endpoint di bawah belum terdaftar pada hasil clone**. Semua langkah Send/Runner dalam bagian ini bersifat **bersyarat: hanya setelah paket API benar-benar diintegrasikan dan diuji**. Jangan memakai keberhasilan API historis pada working tree sebagai bukti clone saat ini menyediakan API.
+**SUDAH TERSEDIA DALAM CLONE BRANCH PADA ad03cc5.** Paket **7 path API + 3 file Postman** sudah committed/dipush: route, Controller, middleware, dua Request, response helper dan registrasi API, bersama collection JSON, environment contoh dan [README Postman](postman/README.md). Ikuti instalasi [XAMPP](#xampp) atau [Laragon](#laragon) pada database lokal sendiri; jangan memakai kasorg_dev integrator. Paket ini siap **dicoba**, bukan klaim MySQL/Postman GUI laptop anggota sudah lulus. Lihat [bukti SQLite yang terpisah](#hasil-uji-api).
 
-Base URL contoh setelah integrasi: `http://127.0.0.1:8000`. Prefix /api akan memakai registrasi yang sudah ada pada diff lokal bootstrap/app.php, tetapi belum masuk checkpoint ini.
+Base URL contoh: `http://127.0.0.1:8000`. Prefix `/api` berasal dari registrasi [routes/api.php](routes/api.php) pada [bootstrap/app.php](bootstrap/app.php), keduanya sudah termasuk checkpoint. Setelah dependency, konfigurasi privat dan database sendiri siap, periksa melalui terminal kedua `php artisan route:list --path=api`; harapannya dua route GET|HEAD berikut terdaftar. Perintah tersebut hanya memeriksa pendaftaran, bukan membuktikan query/login berhasil.
 
 | Method / endpoint | Query opsional | Hasil |
 | --- | --- | --- |
@@ -1106,16 +1112,16 @@ Baca data.saldo_awal/pemasukan/pengeluaran/saldo_akhir dan grafik_bulanan/alokas
 | 302 | Login/logout form berhasil mengarahkan tujuan. | Header Location; matikan follow redirects agar terlihat. |
 | 401 | Belum mempunyai sesi login yang berlaku untuk API. | Login di Postman dan cookie host yang benar. |
 | 403 | Identitas ada tetapi role/status/izin tidak sesuai. | Role aktif dan akses yang memang diizinkan; jangan melewati middleware. |
-| 404 | URL/objek tidak ditemukan, atau API belum ada pada revisi clone. | Path endpoint dan kelengkapan route. Kasus 11 memang mengharapkan 404. |
+| 404 | URL/objek tidak ditemukan, atau penguji memakai revisi lama sebelum API terintegrasi. | Path endpoint, checkpoint dan kelengkapan route. Kasus 11 memang mengharapkan 404. |
 | 419 | Token form tidak cocok dengan sesi/kedaluwarsa. | CSRF dan cookie; ambil token baru setelah login untuk logout. |
 | 422 | Parameter gagal validasi, bukan error database yang harus direset. | Body errors.jenis/errors.periode_id sesuai request. |
 | 500 | Ada exception server. | Baca log privat bersama pengelola, jangan membagikan rahasia atau reset data. |
 
 ### Impor dan isi environment
 
-1. Pastikan source API sudah terintegrasi, database yang benar aktif, dan Artisan berjalan. Database existing tidak perlu dimigrasikan/di-seed lagi.
-2. Postman → Import → pilih `postman/KasOrg-UTS.postman_collection.json`. Update/replace salinan lama agar script sinkronisasi tidak tertukar.
-3. Import `postman/KasOrg-Local.example.postman_environment.json`, lalu pilih environment **KasOrg Local — contoh tanpa kredensial**.
+1. Pastikan clone memuat checkpoint ad03cc5 atau pembaruan yang disepakati, database lokal sendiri sudah disiapkan, MySQL aktif, dan Artisan berjalan. Database existing tidak perlu dimigrasikan/di-seed lagi.
+2. Postman → Import → pilih [postman/KasOrg-UTS.postman_collection.json](postman/KasOrg-UTS.postman_collection.json) dari folder clone. Update/replace salinan lama agar script sinkronisasi tidak tertukar.
+3. Import [postman/KasOrg-Local.example.postman_environment.json](postman/KasOrg-Local.example.postman_environment.json), lalu pilih environment **KasOrg Local — contoh tanpa kredensial**.
 4. Isi variabel berikut hanya pada nilai **lokal/privat**, bukan file contoh yang akan diunggah:
 
    | Variabel | Pengisian/pemakaian |
@@ -1129,7 +1135,7 @@ Baca data.saldo_awal/pemasukan/pengeluaran/saldo_akhir dan grafik_bulanan/alokas
 5. Jangan mencampur localhost/127.0.0.1 atau port/protokol antar-request. Jika run lama berhenti setelah login, bersihkan cookie **hanya host development tersebut** melalui menu Cookies. Browser login tidak otomatis membuat Postman login.
 6. Pertahankan **Automatically follow redirects OFF** dan cookie jar aktif pada 03–13. Request 01–02 memang menonaktifkan cookie untuk skenario guest; 13 harus memakai cookie hasil logout agar benar-benar menguji sesi berakhir.
 
-Menandai password sebagai secret hanya menyamarkan tampilan. Jangan ekspor/sinkronkan environment yang sudah berisi password, cookie atau token ke repository/workspace bersama. Representasi YAML juga tersedia di `postman/postman/collections/` dan `postman/postman/environments/`; JSON di atas adalah jalur impor utama.
+Menandai password sebagai secret hanya menyamarkan tampilan. Jangan ekspor/sinkronkan environment yang sudah berisi password, cookie atau token ke repository/workspace bersama. **Paket utama cukup collection JSON, environment JSON contoh dan README Postman**; workspace YAML masih lokal, tidak ikut commit ad03cc5 dan tidak diperlukan untuk impor atau menjalankan collection.
 
 ### Belajar memakai Send sebelum menjalankan Runner
 
@@ -1167,7 +1173,7 @@ Pilih collection → **Run collection / Runner**, pilih environment tadi, satu i
 
 Baca tab **Body** untuk JSON, status HTTP untuk hasil transport, dan **Test Results/Runner** untuk assertions. Respons 422/401/404 pada kasus negatif adalah hasil yang diharapkan, bukan otomatis kegagalan collection. HTTP 200 saja tidak membuktikan nominal benar; script 07 memeriksa rumus dan 08 membandingkan saldo Rupiah Dashboard hingga sen.
 
-Target collection tersinkron: **13 request / 51 assertions / 0 gagal**. `postman/README.md` mencatat hasil CLI sebelumnya terhadap aplikasi/database asli dengan fingerprint data tetap; **tidak dijalankan ulang di tugas README ini**, dan GUI sesudah sinkronisasi belum diverifikasi ulang. Collection memakai Admin; dukungan role Anggota/403 diuji terpisah, bukan tercakup seluruhnya oleh 13 request. Runner historis tests/Manual/postman-api-smoke.php menargetkan dua role dan tidak boleh langsung dianggap cocok dengan collection Admin sekarang.
+Target collection tersinkron: **13 request / 51 assertions / 0 gagal**. [README Postman](postman/README.md) memisahkan catatan historis integrator dari pengujian paket API **SQLite terisolasi** yang lulus CLI 13/51; keduanya **tidak dijalankan ulang dalam tugas README ini**. Postman GUI di laptop anggota belum dinyatakan lulus. Collection memakai Admin; dukungan Anggota/403 diuji terpisah dalam 20/20 pemeriksaan HTTP, bukan seluruhnya tercakup 13 request. Runner historis `tests/Manual/postman-api-smoke.php` masih lokal, terikat lingkungan integrator dan bukan langkah instalasi/test pemula. Jangan menjalankan runner Manual atau mode `KASORG_*_MARIADB` untuk mengikuti panduan ini.
 
 <a id="pengujian"></a>
 
@@ -1175,7 +1181,9 @@ Target collection tersinkron: **13 request / 51 assertions / 0 gagal**. `postman
 
 <a id="hasil-uji"></a>
 
-### 11.1. Hasil paket terisolasi — 9 November 2026
+### 11.1. Hasil pengujian terisolasi — dua tahap berbeda
+
+#### A. Paket portal — 9 November 2026
 
 Sumber yang diuji adalah **HEAD f3aa6c4 + 34 path index**, kemudian dicatat/dipush sebagai **15e32bc**. Ekspor dilakukan menggunakan checkout-index ke folder baru terpisah, **bukan** menyalin seluruh working tree atau memakai database integrator. Fingerprint staged diff saat pengujian: `5466bb112e09fecd9e7d8acad3d7395d2a741a6c711df9437e8f392d59a5b032`.
 
@@ -1192,7 +1200,26 @@ Sumber yang diuji adalah **HEAD f3aa6c4 + 34 path index**, kemudian dicatat/dipu
 | Browser | Lulus pada cakupan Chrome headless yang diuji: login, modal/form tambah-edit-hapus, toggle mouse dan keyboard, logout/403; pemisahan aset Bootstrap/legacy; smoke desktop 1440×900 dan mobile 390×844. Bukan audit pixel seluruh halaman. |
 | Integritas | Tidak ada pelanggaran FK SQLite; source salinan tidak diubah untuk meluluskan tes. Source proyek asli, staging dan 77 perubahan di luar paket tetap utuh; kasorg_dev tidak diakses. |
 
-**Belum terbukti:** fresh clone nyata di laptop anggota, migration/seeder dan perilaku MySQL/MariaDB pada laptop itu, seluruh alur keuangan/PDF, integrasi API/Postman pada clone, serta kesiapan production. Pengujian CLI Postman dan fixture lama adalah bukti historis terpisah, bukan tambahan hasil 45/45. Tugas pembaruan README ini **tidak menjalankan ulang** build, migration, seeder, browser atau tes aplikasi.
+Hasil **45/45** di atas hanya untuk paket portal 15e32bc; API/Postman belum termasuk sumber yang diuji pada tahap itu. Integrasi API kini sudah dipush pada ad03cc5 dengan bukti tahap terpisah di bawah. Riwayat portal dan fingerprint tersebut tidak diganti seolah-olah merupakan pengujian commit terbaru secara menyeluruh.
+
+<a id="hasil-uji-api"></a>
+
+#### B. Paket API/Postman — 9 November 2026
+
+Salinan pengujian berisi **checkpoint dasar 2e001ba + 10 path API/Postman lokal**, yang kemudian committed/dipush sebagai **ad03cc5**. Database pengujian memakai **SQLite terisolasi**, bukan MySQL/MariaDB aktif. Test/helper tambahan hanya disalin ke lingkungan pengujian untuk verifikasi, **tidak ikut paket sepuluh path**; suite lengkap belum otomatis diperoleh dari clone.
+
+| Pemeriksaan yang benar-benar dilakukan sebelumnya | Hasil dan batas |
+| --- | --- |
+| Instalasi PHP | Composer install berhasil dari lockfile: 118 instalasi, tanpa update dependency. |
+| Database terisolasi | 11 migration asli dan seeder dua akun demo berhasil pada SQLite baru. |
+| Test API terpilih | **15 tes / 148 assertions lulus**, memakai SQLite RAM; validasi, session/CSRF, role, privasi, error dan konsistensi saldo desimal nonnol. Bukan seluruh suite regresi. |
+| Collection melalui Postman CLI | **13 request / 51 assertions / 0 gagal**, exit 0, melalui HTTP Laravel dan SQLite hasil migration/seeder. Saldo awal kosong tetap diuji sebagai nol. Bukan Postman GUI di laptop anggota. |
+| HTTP tambahan | **20/20 lulus**: dua role, login/CSRF, Dashboard, Anggota ke Admin 403, API, validasi periode dan logout. |
+| Integritas | Fingerprint delapan tabel domain identik sebelum/sesudah HTTP; tidak ada pelanggaran FK SQLite. |
+
+Percobaan CLI pertama gagal karena direktori kerja server pengujian salah; konfigurasi proses server diperbaiki, lalu run lengkap lulus tanpa mengubah source API atau menghapus assertion. Detail dan pemisahan bukti historis integrator ada di [postman/README.md](postman/README.md).
+
+**Belum terbukti:** fresh clone nyata di laptop anggota, migration/seeder dan perilaku MySQL/MariaDB pada laptop itu, Postman GUI laptop anggota, seluruh alur keuangan/PDF, seluruh regresi aplikasi, serta kesiapan production. SQLite tidak membuktikan ENUM/DECIMAL/locking MySQL. Pengujian portal, API dan fixture lama tidak dijumlahkan sebagai satu run penuh. Tugas pembaruan README ini **tidak menjalankan ulang** build, migration, seeder, browser, HTTP, Postman atau tes aplikasi.
 
 <a id="uji-crud"></a>
 
@@ -1262,6 +1289,10 @@ Semua kotak sengaja belum dicentang; hasil SQLite integrator tidak mengisi bukti
 - [ ] Validasi NIM/email/password berjalan.
 - [ ] Anggota mendapat 403 pada akses Admin.
 - [ ] Logout mengakhiri sesi.
+- [ ] Dua endpoint tampil pada route:list --path=api untuk revisi ad03cc5 atau pembaruan yang disepakati.
+- [ ] Collection JSON dan environment contoh dari repository diimpor; nilai Admin hanya diisi privat.
+- [ ] Postman Runner menjalankan 01–13 dengan redirect OFF, cookie/CSRF sesuai panduan dan 51 assertions lulus pada MySQL sendiri.
+- [ ] Status negatif 401/404/422, kesesuaian saldo API/Dashboard pada periode sama, dan penolakan sesi setelah logout diverifikasi.
 - [ ] Screenshot bukti disimpan tanpa rahasia.
 - [ ] Hasil testing dan kendala dilaporkan ke kelompok.
 
@@ -1275,7 +1306,7 @@ php artisan route:list --path=admin/anggota
 php artisan route:list --path=api
 ~~~
 
-Pada checkpoint 15e32bc, filter API belum menunjukkan dua endpoint KasOrg karena paket API belum terintegrasi. /ui-preview/* hanya untuk APP_ENV local, bukan pengganti login operasional.
+Pada checkpoint **ad03cc5**, filter API seharusnya menunjukkan `GET|HEAD api/kategori-transaksi` dan `GET|HEAD api/transparansi/ringkasan`. Jika tidak, periksa branch/revisi dan kelengkapan source; jangan menambahkan route dummy. `/ui-preview/*` hanya untuk APP_ENV local, bukan pengganti login operasional. Pemeriksaan route bukan bukti seluruh operasi database berhasil.
 
 [phpunit.xml](phpunit.xml) mengatur testing, SQLite :memory:, session/cache array dan queue sync. Test konfigurasi demo yang committed dapat dipelajari melalui [DemoAccountConfigurationTest](tests/Unit/DemoAccountConfigurationTest.php); test ini memblokir koneksi DB. Suite lengkap AuthenticationTest, AnggotaCrudTest, FinanceSchema dan runner browser masih lokal, **bukan hasil clone**.
 
@@ -1334,13 +1365,13 @@ Saat presentasi, tunjukkan satu contoh data uji yang disetujui dan jelaskan jalu
 
 ### Alur demo inti
 
-**Demo checkpoint saat ini: Login Admin → Dashboard → CRUD Anggota → validasi salah → logout → login Anggota/403 → logout.** API JSON/Postman tetap persyaratan UTS yang harus diselesaikan melalui integrasi berikutnya, bukan diklaim sudah ada pada clone ini.
+**Rencana demo checkpoint saat ini: Login Admin → Dashboard → CRUD Anggota → validasi salah → logout → login Anggota/403 → Postman 01–13 dengan sesi Admin tersendiri → logout.** Source API/Postman sudah ikut clone ad03cc5; demo pada laptop anggota tetap harus diuji dahulu dengan database MySQL sendiri, bukan dianggap lulus dari bukti SQLite.
 
 1. Konfirmasi source terintegrasi, server/database/aset siap, serta akun demo privat benar.
 2. Login Admin; tunjukkan Dashboard dan periode/saldo nyata, termasuk nol bila belum ada transaksi sah.
 3. Gunakan anggota uji terpisah yang disetujui untuk tambah/edit/status/arsip; tunjukkan validasi NIM/email/password salah tanpa menampilkan rahasia. Jangan mengubah dua demo utama atau data sah kelompok.
 4. Login Anggota pada sesi yang tepat; akses halaman Admin harus 403. Jangan memakai URL role palsu.
-5. **Setelah paket API tersedia saja:** tambahkan Postman 01–13 dengan sesi Admin Postman sendiri untuk menunjukkan 200/422/401, CSRF/logout dan kesesuaian saldo. Sebelum itu, laporkan gap API secara jujur; jangan memakai endpoint palsu.
+5. Jalankan Postman **01–13** dari [paket repository](postman/README.md) dengan sesi Admin Postman sendiri untuk menunjukkan 200/422/401/404, CSRF/logout dan kesesuaian saldo. Hasil Runner pada mesin demo harus dicatat; jangan memakai endpoint palsu atau mengklaim lulus sebelum pengujian.
 6. Logout melalui POST yang benar. Jelaskan satu alur Route → Request/Policy → Controller → Model/Service → database → Blade/JSON.
 
 Jenis Iuran dapat ditunjukkan sebagai pendukung. Pembayaran, PDF, transaksi dan transparansi tetap dipertahankan tetapi tidak harus memakan seluruh waktu demo MVP. Demo tulis hanya memakai data pengujian yang disetujui; jangan merekayasa status pembayaran melalui SQL.
@@ -1374,17 +1405,17 @@ Baca error pertama, catat revisi dan langkah penyebab, lalu diagnosis pada lapto
 | Login gagal | Email/password salah, target DB salah atau rate limit. | Cocokkan email demo dan password privat; perhatikan pesan percobaan login. | Tunggu batas bila perlu; config password environment tidak mereset hash akun existing. |
 | Akun nonaktif ditolak | Aturan status_akun aktif memang diwajibkan. | Periksa status melalui Admin yang sah pada row yang tepat. | Bukan bug untuk dilewati; jangan mengubah demo atau SQL manual demi login. |
 | HTTP 403 | Role/status/Policy menolak aksi. | Periksa akun dan URL tujuan. | Anggota ke Admin memang harus 403; jangan menonaktifkan authorization. |
-| HTTP 404 | Path/objek tidak ada; API belum terintegrasi pada checkpoint ini. | Cek URL, route:list dan model binding. | Gunakan route/objek sah; koordinasikan integrasi, jangan route dummy. |
-| HTTP 419 CSRF | Token kedaluwarsa atau cookie berbeda host/session. | Buka ulang form; gunakan satu host/protokol, cek session. | Login ulang bila perlu, pertahankan CSRF. Langkah token Postman hanya setelah paket API tersedia. |
+| HTTP 404 | Path/objek tidak ada atau penguji memakai revisi lama/tidak lengkap. | Cek URL, route:list, checkpoint ad03cc5 dan model binding. | Gunakan route/objek sah; request Postman 11 memang menguji 404. Jangan route dummy. |
+| HTTP 419 CSRF | Token kedaluwarsa atau cookie berbeda host/session. | Buka ulang form; gunakan satu host/protokol, cek session. | Pertahankan CSRF/cookie. Postman 03 mengambil token login; 08 memperbarui token sesi aktif untuk logout 12. |
 | HTTP 500 | Exception, konfigurasi/ekstensi atau izin runtime. | Pengelola membaca log privat, catat error pertama tanpa membagikan SQL/stack trace/rahasia. | Perbaikan harus sesuai penyebab dan persetujuan, bukan reset DB atau membuka APP_DEBUG pada demo publik. |
-| RouteNotFoundException | Checkout salah atau nama route/file tidak konsisten. | git rev-parse HEAD, git branch --show-current, php artisan route:list. | Pada 15e32bc route sidebar portal sudah ada; jika hilang pastikan revisi/source utuh. Jangan menyembunyikan menu atau membuat route palsu. |
+| RouteNotFoundException | Checkout salah atau nama route/file tidak konsisten. | git rev-parse HEAD, git branch --show-current, php artisan route:list. | Pada ad03cc5 route portal dan API sudah committed; jika hilang pastikan revisi/source utuh. Jangan menyembunyikan menu atau membuat route palsu. |
 | View not found | File Blade/include tidak lengkap atau salah revisi. | Cocokkan nama view dengan resources/views dan commit. | Koordinasikan file asli; jangan placeholder. Jangan menyalin seluruh working tree privat integrator. |
 | CSS berantakan / modal tidak aktif | Aset gagal, public/hot ke server lain, reset ganda atau script belum dimuat. | Network/Console browser, manifest, empat output, route Bootstrap vs legacy. | Gunakan build lokal dan satu jalur CSS/JS per halaman; jangan tambah bundle CDN di atas Vite atau langsung redesign. |
 | Port 8000 terpakai | Server lain masih berjalan. | Baca pesan Artisan dan konfirmasi pemilik proses. | Pakai port kosong, misalnya php artisan serve --host=127.0.0.1 --port=8001; set APP_URL=http://127.0.0.1:8001 dan buka /login pada port itu. Jangan mematikan proses tidak dikenal. |
 | Permission storage/cache | PHP tidak dapat menulis folder runtime instalasinya. | Tinjau pemilik/ACL storage dan bootstrap/cache. | Beri izin seperlunya untuk pengguna/proses sendiri, bukan Everyone full control atau chmod 777 umum. |
 | PDF gagal dirender | Dependency/font/gambar/ekstensi tidak tersedia, periode invalid atau batas 2.000 transaksi. | Periksa error privat, versi Dompdf dan periode; GD disarankan untuk gambar. | Gunakan dependency terkunci/lingkup lebih sempit; jangan aktifkan remote/PHP execution Dompdf atau mengklaim berhasil tanpa file valid. |
 | Grafik kosong/angka nol | Belum ada transaksi sah atau filter periode berbeda. | Periksa periode/data kas yang sah pada DB sendiri. | Nol/empty state valid; jangan mengisi mock. Tagihan dan pembayaran menunggu/ditolak bukan pemasukan. |
-| API/Postman tidak jalan | Paket API belum tersedia pada checkpoint clone ini. | route:list --path=api dan status source/collection. | Tunggu integrasi dan tes terpisah. Setelah tersedia, diagnosis 401/session atau 422/parameter mengikuti bagian Postman. |
+| API/Postman tidak jalan | Revisi lama, server/base_url salah, cookie/CSRF, akun atau parameter tidak sesuai. | Cocokkan ad03cc5, route:list --path=api, environment privat dan urutan request. | Ikuti [panduan Postman](postman/README.md); login browser tidak memberi sesi Postman. 401 guest dan 422 kasus negatif memang diharapkan; jangan reset DB/seed ulang. |
 
 Jika harus membaca log atau konfigurasi privat, lakukan bersama pemilik mesin dan sensor bukti. README ini tidak memberi izin mengubah data sah, database integrator, atau source tanpa review.
 
@@ -1392,7 +1423,7 @@ Jika harus membaca log atau konfigurasi privat, lakukan bersama pemilik mesin da
 
 ## 13. Status GitHub dan kerja kelompok
 
-Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **jovan/integrasi-laravel**. Pada **9 November 2026**, HEAD lokal dan SHA branch remote diperiksa secara read-only melalui `git ls-remote`: keduanya **15e32bc76f780dbd0560f3d8c58aae029e5966e4**. Tidak ada fetch, staging, commit atau push dalam pembaruan ini. Histori lokal menuju checkpoint tersebut memuat:
+Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **jovan/integrasi-laravel**. Pada **9 November 2026**, HEAD lokal dan SHA branch remote diperiksa secara read-only melalui `git ls-remote`: keduanya **ad03cc52e21ee8d2a0a7fa0f70071d36024b91fc**. Tidak ada fetch, staging, commit atau push dalam pembaruan README ini. Histori menuju checkpoint tersebut memuat:
 
 | Urutan | Commit | Isi checkpoint |
 | --- | --- | --- |
@@ -1412,10 +1443,12 @@ Repository: [Jopannnnnn/KasOrg](https://github.com/Jopannnnnn/KasOrg), branch **
 | 14 | 2218519 | Backend Transaksi Kas Manual — DALAM PENGEMBANGAN. |
 | 15 | f3aa6c4 | Backend Laporan/PDF dan dependensi Dompdf — DALAM PENGEMBANGAN. |
 | 16 | **15e32bc** | Paket integrasi portal 34 path (19 A, 15 M): route/layout/navigasi, Blade operasional, Bootstrap/legacy, README dan contoh MySQL. Snapshot diuji terisolasi dengan SQLite; belum final. |
+| 17 | [2e001ba](https://github.com/Jopannnnnn/KasOrg/commit/2e001ba424d9ce851c482f38f747b778b89c1e23) | Pembaruan README utama untuk instalasi dan testing KasOrg; hanya README.md. Checkpoint dokumentasi sebelumnya, bukan integrasi API. |
+| 18 | [**ad03cc5**](https://github.com/Jopannnnnn/KasOrg/commit/ad03cc52e21ee8d2a0a7fa0f70071d36024b91fc) | Paket API/Postman tepat **10 path (9 A, 1 M)**: tujuh path implementasi/registrasi API dan tiga file Postman. Sudah dipush; bukti uji SQLite terisolasi, belum MySQL/GUI laptop anggota. |
 
-**Sudah tersedia pada 15e32bc:** route asli portal kedua role, lima route CRUD Anggota, layout Bootstrap/legacy, sidebar/topbar, Dashboard, halaman keuangan/partial/preview, aset pendukung, backend/domain/migration/seeder, Login/error, Composer/npm lockfile dan contoh konfigurasi MySQL. Sembilan named route sidebar yang dahulu tertunda kini sudah terdaftar; informasi lama “CRUD/layout belum committed” tidak berlaku untuk checkpoint ini.
+**Sejak 15e32bc, tetap tersedia pada ad03cc5:** route asli portal kedua role, lima route CRUD Anggota, layout Bootstrap/legacy, sidebar/topbar, Dashboard, halaman keuangan/partial/preview, aset pendukung, backend/domain/migration/seeder, Login/error, Composer/npm lockfile dan contoh konfigurasi MySQL. Sembilan named route sidebar yang dahulu tertunda sudah terdaftar. **Sejak ad03cc5:** dua endpoint API beserta registrasi/middleware/validasi/respons JSON dan paket utama Postman juga ikut clone; informasi lama “CRUD/layout/API belum committed” tidak berlaku untuk checkpoint terbaru.
 
-**Belum ikut checkpoint:** registrasi/implementasi API JSON, Postman, sebagian suite regresi dan runner visual, pemindahan arsip SQL historis serta dokumen tahap lokal. Penambahan itu tetap dipertahankan untuk review/integrasi berikutnya, bukan diam-diam dihapus. Main belum menerima paket portal terbaru; branch integrasi bukan rilis production.
+**Belum ikut checkpoint:** sebagian suite regresi/helper dan runner visual/Manual, workspace YAML Postman, pemindahan arsip SQL historis serta dokumen tahap lokal. Itu bukan syarat tambahan untuk mengimpor collection JSON. Perubahan tetap dipertahankan untuk review/integrasi terpisah, bukan diam-diam dihapus. Main belum menerima paket terbaru; branch integrasi bukan rilis production.
 
 <a id="distribusi-checkpoint"></a>
 
@@ -1437,24 +1470,42 @@ Commit [15e32bc](https://github.com/Jopannnnnn/KasOrg/commit/15e32bc76f780dbd056
 
 Fondasi lain **sudah masuk commit sebelumnya**: backend/auth/Model/migration/seeder, aset serta komponen Bootstrap, CSS/pagination Anggota, halaman Login/error, Composer lockfile dan [package-lock.json](package-lock.json). File tersebut tidak semuanya berubah lagi dalam paket 34 path. Dengan demikian, pernyataan lama bahwa route/layout/lockfile/CRUD masih belum tersedia di GitHub **tidak berlaku pada checkpoint ini**.
 
-### Yang tidak otomatis diperoleh dari clone checkpoint ini
+### Paket API/Postman ad03cc5 — tepat 10 path
 
-| Kelompok | Kondisi GitHub 15e32bc vs working tree integrator | Dampak bagi anggota |
+Commit [ad03cc5](https://github.com/Jopannnnnn/KasOrg/commit/ad03cc52e21ee8d2a0a7fa0f70071d36024b91fc), berjudul **feat(api): integrasikan endpoint JSON dan Postman UTS**, menambahkan **9 path (A)** dan memodifikasi **1 path (M)**. Tidak memuat test tambahan, workspace YAML, README utama atau perubahan SQL.
+
+| Status | Path yang sudah dipush | Fungsi |
+| --- | --- | --- |
+| M | [bootstrap/app.php](bootstrap/app.php) | Registrasi API dan penanganan error JSON; route web tetap dipertahankan. |
+| A | [routes/api.php](routes/api.php) | Dua GET dengan session, auth, akun aktif dan role Admin/Anggota. |
+| A | [app/Http/Controllers/Api/KasController.php](app/Http/Controllers/Api/KasController.php) | Kategori serta ringkasan kas melalui sumber perhitungan bersama. |
+| A | [app/Http/Middleware/EnsureApiJson.php](app/Http/Middleware/EnsureApiJson.php) | Format JSON dan penolakan akses yang konsisten. |
+| A | [app/Http/Requests/Api/KategoriTransaksiRequest.php](app/Http/Requests/Api/KategoriTransaksiRequest.php) | Validasi filter jenis kategori. |
+| A | [app/Http/Requests/Api/RingkasanRequest.php](app/Http/Requests/Api/RingkasanRequest.php) | Validasi periode ringkasan API. |
+| A | [app/Http/Responses/ApiResponse.php](app/Http/Responses/ApiResponse.php) | Envelope JSON sukses/error dan Cache-Control privat. |
+| A | [postman/KasOrg-UTS.postman_collection.json](postman/KasOrg-UTS.postman_collection.json) | 13 request session/CSRF, status, privasi dan konsistensi saldo. |
+| A | [postman/KasOrg-Local.example.postman_environment.json](postman/KasOrg-Local.example.postman_environment.json) | Template base_url/variabel dengan kredensial dan token kosong. |
+| A | [postman/README.md](postman/README.md) | Setup lokal, impor JSON, Runner dan batas bukti pengujian. |
+
+### Distribusi checkpoint terbaru dan yang masih lokal
+
+| Kelompok | Kondisi GitHub ad03cc5 vs working tree integrator | Dampak bagi anggota |
 | --- | --- | --- |
 | Web, login, dashboard dan CRUD Anggota | Source runtime sudah committed; audit dependensi tidak menemukan file P0 tertinggal. | **Layak dicoba melalui fresh clone dan pengujian MySQL**, bukan sudah dinyatakan lulus MySQL di laptop teman. Instalasi dependency, konfigurasi privat, migration/seeder database baru dan build tetap diperlukan. |
-| API JSON | routes/api.php, KasController, EnsureApiJson, dua Request, ApiResponse, serta perubahan registrasi/exception pada bootstrap/app.php masih lokal. | Dua endpoint API belum tersedia pada clone; integrasikan ketujuh path yang saling bergantung sebelum menjalankan tutorial API. Jangan mengambil bootstrap/app.php lokal sendirian. |
-| Postman | Collection JSON, environment contoh, panduan dan representasi workspace YAML belum dipush. | Tidak ada collection KasOrg dari checkpoint ini. JSON utama dan environment contoh cukup untuk jalur impor; YAML adalah representasi pendamping, bukan endpoint tambahan. |
-| Suite otomatis | Test konfigurasi demo/scaffold dasar sudah tracked; suite Feature lengkap, helper dan runner tambahan masih lokal. | Hasil 45/45 adalah bukti pengujian sebelumnya, bukan jaminan menjalankan seluruh suite pada clone sekarang akan lulus. Baca [catatan assertion dan runner](#pengujian). |
+| API JSON | Ketujuh path implementasi/registrasi sudah committed pada ad03cc5. | Dua endpoint ikut clone; setelah instalasi sendiri siap, periksa route dan lakukan pengujian login/JSON. SQLite terisolasi lulus, tetapi MySQL laptop teman belum terbukti. |
+| Postman utama | Collection JSON, environment contoh dan README sudah committed. | Impor langsung dari repository dan jalankan 01–13 sesuai panduan; isi kredensial privat sendiri. Tidak membutuhkan file YAML atau runner Manual. |
+| Workspace YAML Postman | Masih lokal dan bukan bagian paket utama. | Tidak otomatis ikut clone dan tidak diperlukan untuk mengimpor dua JSON. Jangan menyalin workspace privat tanpa review. |
+| Suite otomatis | Test konfigurasi demo/scaffold dasar sudah tracked; suite Feature lengkap, helper dan runner tambahan masih lokal. | Hasil portal 45/45 dan API 15/148 adalah bukti pengujian terpisah sebelumnya, bukan jaminan seluruh suite clone lulus. Baca [catatan assertion dan runner](#pengujian). |
 | Dokumen dan arsip historis | Dokumen tahap serta pemindahan SQL masih lokal; beberapa pedoman tracked memiliki revisi yang belum dipush. | Tautan ke path tracked membuka versi checkpoint, bukan revisi lokal terbaru. Path lokal tanpa tautan bukan syarat boot dan jangan dianggap hilang karena instalasi gagal. |
 
-README pada commit 15e32bc sudah tersedia di GitHub. Penyempurnaan README setelah checkpoint itu tetap **perubahan lokal sampai mendapat persetujuan commit/push tersendiri**; dokumentasi ini tidak mengubah checkpoint aplikasi atau mengirim file tambahan secara otomatis.
+README portal pada 15e32bc dan pembaruan dokumentasi pada **2e001ba** sudah tersedia di GitHub; ad03cc5 menambahkan API/Postman tanpa mengubah README utama. **Sinkronisasi README yang sedang dibaca ini tetap perubahan lokal sampai mendapat persetujuan commit/push tersendiri.** Dokumentasi ini tidak mengubah checkpoint aplikasi, menyertakan perubahan lokal lain, atau mengirim file secara otomatis.
 
 ### Git untuk anggota kelompok
 
 - **Commit** menyimpan snapshot perubahan terpilih di repository lokal; **push** mengirim commit ke GitHub. File yang belum committed tidak otomatis ikut push.
 - **main** adalah tujuan integrasi kelompok/penyerahan yang harus ditinjau dan diuji; **jovan/integrasi-laravel** menampung integrasi pengembangan yang sekarang dapat dicoba sesuai batas bukti di atas.
 - Pilih branch saat clone seperti tutorial XAMPP/Laragon. Jangan mengganti judul/scope atau mengubah atribusi/identitas author untuk menambah jumlah kontribusi.
-- **Pull Request (PR)** adalah permintaan review untuk menggabungkan branch. Belum langsung merge ke main karena pengujian MySQL, integrasi API, regresi dan deliverable UTS belum seluruhnya selesai. Main/tag mvp-rc memerlukan keputusan serta pengujian kelompok tersendiri.
+- **Pull Request (PR)** adalah permintaan review untuk menggabungkan branch. Source API sudah terintegrasi di branch ini, tetapi pengujian MySQL/Postman GUI laptop anggota, regresi lengkap dan deliverable UTS belum seluruhnya selesai. Main/tag mvp-rc memerlukan keputusan serta pengujian kelompok tersendiri.
 
 **Mengambil update di laptop anggota, hanya setelah koordinasi:**
 
@@ -1474,7 +1525,7 @@ git pull --ff-only origin jovan/integrasi-laravel
 
 Fetch memperbarui informasi remote; pull --ff-only hanya maju jika histori memungkinkan. Jika ditolak/divergen, hentikan dan koordinasikan, **bukan** force push/rebase/merge otomatis. Setelah update, baca perubahan dependency/schema; Composer install/npm ci/build dilakukan sesuai kebutuhan, sedangkan migration/seeder existing tidak dijalankan sembarangan. Jangan menyalin .env orang lain.
 
-Setiap staging, commit, push, PR/merge atau perubahan data tim tetap perlu persetujuan yang sesuai. Fokus berikutnya adalah uji MySQL di mesin anggota serta API terpisah, bukan memaksakan commit kecil yang membuat snapshot tidak konsisten. Tidak ada operasi Git tulis dalam tugas pembaruan README ini.
+Setiap staging, commit, push, PR/merge atau perubahan data tim tetap perlu persetujuan yang sesuai. Fokus berikutnya adalah uji instalasi MySQL, CRUD serta API/Postman GUI di mesin anggota, kemudian review suite regresi, bukan memaksakan commit kecil yang membuat snapshot tidak konsisten. Tidak ada operasi Git tulis dalam tugas pembaruan README ini.
 
 Atribusi dan bukti kontribusi harus sesuai pekerjaan sebenarnya: Refan UI/UX, Kent rancangan awal, Jovan integrasi; kontribusi dokumentasi/QA anggota lain dicatat dari bukti yang tersedia. Jangan menyimpulkan kontribusi hanya dari author satu commit besar atau membuat co-author yang tidak sesuai.
 
@@ -1491,6 +1542,7 @@ Atribusi dan bukti kontribusi harus sesuai pekerjaan sebenarnya: Refan UI/UX, Ke
 - Bukti transfer privat berupa gambar JPEG/PNG/WebP maksimal 5 MB; penerimaan tunai/mutasi diperiksa **manual**, tidak ada payment gateway atau API bank.
 - Laporan/PDF memakai data saat request dan periode terpilih, maksimal 2.000 transaksi untuk PDF; bukan arsip beku. Perubahan transaksi antara membuka HTML dan meminta PDF bisa mengubah isinya.
 - Bootstrap belum seluruh halaman; font/ikon masih eksternal. Clean clone, E2E seluruh fitur setelah Bootstrap, pengujian GUI Postman terbaru, locking MariaDB multiproses serta deliverable main/tag/PR tidak boleh dinyatakan lulus hanya dari README/fixture/build.
+- Arsip SQL historis Kent yang sudah memiliki versi di GitHub memerlukan **review privasi bersama pemilik data/kelompok** karena temuan data pengguna dan hash password. Integrasi API tidak menyelesaikan risiko publikasi tersebut; jangan membagikan ulang data/hash atau mengubah histori/arsip tanpa persetujuan penanganan terpisah.
 
 ### Rujukan — bedakan yang tersedia di branch dan yang masih lokal
 
@@ -1501,9 +1553,9 @@ Tautan di bawah hanya menunjuk path yang sudah tercatat pada checkpoint. Jika fi
 - Database: `docs/SETUP_DATABASE_DEVELOPMENT.md`, `docs/DRAFT_SKEMA_DATABASE_LARAVEL.md`, `docs/REVIEW_DATABASE_BERSAMA_KENT.md`, `docs/PENYELARASAN_DATABASE_G1.md`, `docs/DATA_DEMO_UTS.md`.
 - Implementasi: `docs/AUTENTIKASI_TAHAP_4A.md`, `docs/CRUD_ANGGOTA_TAHAP_5A.md`, `docs/CRUD_JENIS_IURAN_TAHAP_5D4A.md`, `docs/VERIFIKASI_JENIS_IURAN_TAGIHAN_5D4A_1.md`, `docs/PEMBAYARAN_ULANG_TAHAP_5B.md`, [scope pembayaran](docs/KASORG_SCOPE_PEMBAYARAN.md).
 - Keuangan: `docs/CRUD_TRANSAKSI_TAHAP_5D3.md`, `docs/INTEGRASI_DASHBOARD_TAHAP_5D2.md`, `docs/LAPORAN_KEUANGAN_TAHAP_5D4B.md`.
-- API/frontend: `docs/API_TAHAP_6A.md`, `postman/README.md`, `docs/MIGRASI_BOOTSTRAP_MVP.md`, `docs/AUDIT_FINAL_UTS_KASORG.md`.
+- API yang sudah ikut clone: [panduan Postman](postman/README.md), [collection 13 request](postman/KasOrg-UTS.postman_collection.json), [environment contoh tanpa kredensial](postman/KasOrg-Local.example.postman_environment.json). Catatan API/frontend/audit yang masih lokal: `docs/API_TAHAP_6A.md`, `docs/MIGRASI_BOOTSTRAP_MVP.md`, `docs/AUDIT_FINAL_UTS_KASORG.md`.
 - [panduan.md](docs/panduan.md) milik anggota dokumentasi masih catatan awal, bukan pengganti panduan instalasi/laporan UTS lengkap.
 
-Dokumen tahap/checklist adalah snapshot historis. Contohnya, audit mendahului error 404/500 kustom, panduan migrasi mendahului build sukses, dan checklist/catatan API awal masih menyebut 50 assertion serta beberapa status lama. Panduan Postman lokal tersinkron mencatat 51 assertion historis, tetapi file API/Postman tersebut belum tersedia pada clone. Gunakan source aktual dan bukti tahap yang sesuai; jangan menganggap checklist lama, rencana penghapusan SQL atau hasil pada working tree sebagai kondisi GitHub terbaru.
+Dokumen tahap/checklist adalah snapshot historis. Contohnya, audit mendahului error 404/500 kustom, panduan migrasi mendahului build sukses, dan checklist/catatan API awal masih menyebut 50 assertion serta beberapa status lama. [Panduan Postman yang sudah committed](postman/README.md) mencatat **51 assertions**, memisahkan bukti historis integrator dari uji SQLite terisolasi, dan menjelaskan setup MySQL masing-masing. Gunakan source checkpoint **ad03cc5** dan bukti tahap yang sesuai; jangan menganggap checklist lama, rencana penghapusan SQL atau hasil pada working tree sebagai kondisi GitHub terbaru.
 
-**Batas pembaruan ini:** edit hanya README.md berdasarkan source/metadata dan hasil uji yang sudah tersedia. Tidak membuka .env aktif, mengakses MariaDB, menjalankan migration/seeder/build/test/browser, membuat file Temp, atau melakukan staging/commit/push. Sebelum demo pada laptop anggota, isi checklist instalasi dan uji MySQL secara nyata. Paket SQLite merupakan kemajuan yang terbukti, bukan pengganti pengujian MySQL, integrasi API, PR/main/tag atau kesiapan production.
+**Batas pembaruan ini:** edit hanya README.md berdasarkan source/metadata dan hasil uji yang sudah tersedia. Tidak membuka .env aktif, mengakses MariaDB, membaca ulang/mengubah SQL historis, menjalankan migration/seeder/build/test/browser/runner, membuat file Temp, atau melakukan staging/commit/push. Sebelum demo pada laptop anggota, isi checklist instalasi, CRUD dan Postman pada MySQL secara nyata. Integrasi API sudah dipush; bukti SQLite bukan pengganti pengujian MySQL/GUI, regresi penuh, PR/main/tag atau kesiapan production.
