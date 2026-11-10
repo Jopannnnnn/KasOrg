@@ -1,0 +1,57 @@
+/* Jenis Iuran only: keep Refan's visual language and the pre-migration CRUD
+ * composition. Bootstrap still owns forms, tables, pagination and modal behavior.
+ */
+.kasorg-bootstrap.ko-jenis-page .ko-leading-tight { line-height:1.25 !important; }
+.kasorg-bootstrap.ko-jenis-page .ko-portal-note { line-height:1rem; }
+.kasorg-bootstrap.ko-jenis-page .ko-topbar { gap:0; }
+.kasorg-bootstrap.ko-jenis-page .ko-topbar > div:last-child { flex-shrink:0; }
+.kasorg-bootstrap.ko-jenis-page .shadow-sm { box-shadow:0 1px 2px #0000000d !important; }
+.kasorg-bootstrap.ko-jenis-page .ko-jenis-content > div button.shadow {
+    box-shadow:0 4px 6px -1px #23457833,0 2px 4px -2px #23457833 !important;
+}
+.kasorg-bootstrap.ko-jenis-page .ko-jenis-filter .form-control { flex:1 1 0; width:auto; }
+.kasorg-bootstrap.ko-jenis-page .form-select { appearance:auto; background-image:none; }
+.kasorg-bootstrap.ko-jenis-page .ko-jenis-filter .form-select { width:auto; flex:0 0 auto; }
+.kasorg-bootstrap.ko-jenis-page .ko-jenis-filter > a { color:inherit; }
+.kasorg-bootstrap.ko-jenis-page .ko-jenis-actions button {
+    padding:0; border:0; background:transparent; width:auto; line-height:1rem; vertical-align:baseline;
+}
+.kasorg-bootstrap.ko-jenis-page .ko-table td.text-break { word-break:normal !important; }
+.kasorg-bootstrap.ko-jenis-page .ko-table thead tr { line-height:1rem !important; }
+.kasorg-bootstrap.ko-jenis-page .ko-table > tbody > tr > td { vertical-align:middle; border-bottom:0; }
+.kasorg-bootstrap.ko-jenis-page .ko-table > tbody > tr + tr { border-top:1px solid #f1f5f9; }
+.kasorg-bootstrap.ko-jenis-page nav[aria-label="Paginasi data"] {
+    gap:12px !important; color:#64748b; border-color:#f1f5f9 !important;
+}
+.kasorg-bootstrap.ko-jenis-page .pagination { gap:4px; align-items:center; }
+.kasorg-bootstrap.ko-jenis-page .page-link {
+    font-size:12px; line-height:16px; padding:6px 12px;
+    border-radius:8px !important; margin-left:0 !important;
+}
+.kasorg-bootstrap.ko-jenis-page .page-item.active .page-link { border:0; font-weight:700; }
+.kasorg-bootstrap.ko-jenis-page .page-item.disabled .page-link {
+    background:white; color:#94a3b8; border-color:#e2e8f0;
+}
+.kasorg-bootstrap.ko-jenis-page .modal { --bs-modal-margin:1rem; }
+.kasorg-bootstrap.ko-jenis-page .modal-content { max-height:92vh; background:white; }
+.kasorg-bootstrap.ko-jenis-page .modal-backdrop { --bs-backdrop-bg:#0f172a; }
+.kasorg-bootstrap.ko-jenis-page .modal-header {
+    justify-content:space-between; padding:20px 24px; border-color:#f1f5f9;
+}
+.kasorg-bootstrap.ko-jenis-page .modal-title { line-height:28px !important; }
+.kasorg-bootstrap.ko-jenis-page .modal-header button {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px; line-height:20px;
+}
+.kasorg-bootstrap.ko-jenis-page .modal form { overflow:visible; }
+.kasorg-bootstrap.ko-jenis-page .modal textarea { display:inline-block; vertical-align:baseline; }
+.kasorg-bootstrap.ko-jenis-page .modal .form-check-input { appearance:auto; width:13px; height:13px; }
+.kasorg-bootstrap.ko-jenis-page [role="alert"] ul { padding-left:0; margin-bottom:0; }
+@media(min-width:640px) {
+    .kasorg-bootstrap.ko-jenis-page .ko-table thead tr { line-height:20px !important; }
+}
+@media(max-width:639px) {
+    .kasorg-bootstrap.ko-jenis-page .ko-topbar { padding:1rem 1.5rem; }
+    .kasorg-bootstrap.ko-jenis-page .ko-topbar h1 { font-size:20px !important; }
+    .kasorg-bootstrap.ko-jenis-page nav[aria-label="Paginasi data"] { flex-direction:column; }
+}

@@ -1,46 +1,44 @@
-@php
-    $isAdmin = ($role ?? 'anggota') === 'admin';
-@endphp
-@extends('layouts.app', [
-    'title' => 'Laporan Keuangan | KasOrg', 'heading' => 'Laporan', 'role' => $role ?? 'anggota',
-    'userName' => $isAdmin ? 'Jovan Wijaya' : 'Kent Rafli', 'userInitials' => $isAdmin ? 'JW' : 'KM',
-])
+@extends('layouts.app', ['title' => 'Laporan Keuangan | KasOrg', 'heading' => 'Laporan', 'role' => $role])
 
 @section('content')
-<main class="flex-1 space-y-8 overflow-y-auto p-6 md:p-8">
-    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div><h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Laporan keuangan</h2><p class="mt-0.5 text-xs text-slate-500 sm:text-sm">Rekapitulasi kondisi keuangan organisasi secara lengkap dan transparan.</p></div>
-        <div class="flex items-center gap-3 self-start sm:self-auto">
-            <div class="relative"><button id="periodeLaporan" type="button" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm" aria-expanded="false"><i data-lucide="calendar" class="h-4 w-4 text-slate-500"></i><span id="periodeLaporanLabel">Maret 2026</span></button><div id="periodeLaporanMenu" class="absolute right-0 z-20 mt-2 hidden min-w-40 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg"><button type="button" data-periode="mar" data-label="Maret 2026" class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold hover:bg-slate-50">Maret 2026</button><button type="button" data-periode="feb" data-label="Februari 2026" class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold hover:bg-slate-50">Februari 2026</button><button type="button" data-periode="jan" data-label="Januari 2026" class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold hover:bg-slate-50">Januari 2026</button></div></div>
-            <button id="unduhLaporan" type="button" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-brand-600/20 transition hover:bg-brand-700 sm:text-sm"><i data-lucide="download" class="h-4 w-4"></i> Unduh PDF</button>
+<main id="laporan-keuangan" class="flex-1 space-y-8 overflow-y-auto p-6 md:p-8">
+    <div id="header-laporan" class="flex flex-wrap items-center justify-between gap-4">
+        <div class="min-w-0 flex-1 basis-80"><h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Laporan keuangan</h2><p class="mt-0.5 text-xs text-slate-500 sm:text-sm">Rekapitulasi kondisi keuangan organisasi secara lengkap dan transparan.</p></div>
+        <div id="aksi-laporan" class="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+            @include('laporan.periode-filter')
+            <form method="GET" action="{{ route($role.'.laporan.pdf') }}" class="shrink-0">
+                @if ($scope['selected'] !== null)<input type="hidden" name="periode_id" value="{{ $scope['selected'] }}">@endif
+                <button id="unduhLaporan" type="submit" aria-describedby="status-pdf" class="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-brand-600/20 transition hover:bg-brand-700 sm:w-auto sm:text-sm"><i data-lucide="download" class="h-4 w-4 shrink-0"></i>Unduh PDF</button>
+                <span id="status-pdf" class="sr-only">Unduh PDF berisi seluruh transaksi sah pada periode yang sedang ditampilkan, bukan hanya halaman tabel ini.</span>
+            </form>
         </div>
     </div>
-    <p id="pesanLaporan" class="hidden rounded-xl bg-amber-50 p-4 text-sm text-amber-800" role="status"></p>
-
+    <x-keuangan-feedback />
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div><span class="text-xs font-semibold text-slate-500">Saldo awal</span><div data-stat="awal" class="mt-1 text-2xl font-extrabold text-slate-900">Rp 16.655.000</div></div><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-600"><i data-lucide="wallet-cards" class="h-5 w-5"></i></div></div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div><span class="text-xs font-semibold text-slate-500">Pemasukan</span><div data-stat="masuk" class="mt-1 text-2xl font-extrabold text-slate-900">Rp 4.275.000</div></div><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><i data-lucide="arrow-down-left" class="h-5 w-5"></i></div></div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div><span class="text-xs font-semibold text-slate-500">Pengeluaran</span><div data-stat="keluar" class="mt-1 text-2xl font-extrabold text-slate-900">Rp 2.180.000</div></div><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><i data-lucide="arrow-up-right" class="h-5 w-5"></i></div></div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div><span class="text-xs font-semibold text-slate-500">Saldo akhir</span><div data-stat="akhir" class="mt-1 text-2xl font-extrabold text-slate-900">Rp 18.750.000</div></div><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-brand-600"><i data-lucide="trending-up" class="h-5 w-5"></i></div></div>
+        @foreach ([
+            ['awal', 'opening', 'Saldo awal', 'wallet-cards', 'bg-slate-50 text-slate-600'],
+            ['masuk', 'income', 'Pemasukan', 'arrow-down-left', 'bg-emerald-50 text-emerald-600'],
+            ['keluar', 'expense', 'Pengeluaran', 'arrow-up-right', 'bg-rose-50 text-rose-600'],
+            ['akhir', 'closing', 'Saldo akhir', 'trending-up', 'bg-blue-50 text-brand-600'],
+        ] as [$stat, $key, $label, $icon, $color])
+            <div class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="min-w-0"><span class="text-xs font-semibold text-slate-500">{{ $label }}</span><div data-stat="{{ $stat }}" data-amount="{{ $summary[$key] }}" class="mt-1 break-words text-2xl font-extrabold text-slate-900">{{ \App\Services\RingkasanKasService::rupiah($summary[$key]) }}</div></div>
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $color }}"><i data-lucide="{{ $icon }}" class="h-5 w-5"></i></div>
+            </div>
+        @endforeach
     </div>
-
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2"><h3 class="text-base font-extrabold text-slate-900">Tren saldo kas</h3><p class="mb-6 text-xs text-slate-500">Pergerakan saldo enam bulan terakhir</p><div class="relative flex h-60 flex-col justify-end"><svg class="h-44 w-full overflow-visible" viewBox="0 0 500 150" role="img" aria-label="Grafik tren saldo kas meningkat"><polyline fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="20,130 100,105 200,90 300,75 400,60 480,25"/><g fill="#fff" stroke="#2563eb" stroke-width="3"><circle cx="20" cy="130" r="5"/><circle cx="100" cy="105" r="5"/><circle cx="200" cy="90" r="5"/><circle cx="300" cy="75" r="5"/><circle cx="400" cy="60" r="5"/><circle cx="480" cy="25" r="5"/></g></svg><div class="flex justify-between border-t border-slate-100 pt-4 text-xs font-semibold text-slate-400"><span>Okt</span><span>Nov</span><span>Des</span><span>Jan</span><span>Feb</span><span>Mar</span></div></div></section>
-        <section class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div><h3 class="text-base font-extrabold text-slate-900">Alokasi pengeluaran</h3><p class="mb-6 text-xs text-slate-500">Berdasarkan kategori bulan ini</p><div class="my-4 flex items-center justify-center"><div class="flex h-36 w-36 flex-col items-center justify-center rounded-full border-[18px] border-brand-600 border-l-blue-200 border-r-blue-400 border-t-blue-300"><span class="text-[11px] font-bold text-slate-400">Total</span><span data-stat="donut" class="text-sm font-extrabold text-slate-800">Rp 2,18 jt</span></div></div></div><div class="space-y-2.5 text-xs font-semibold text-slate-700"><div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-brand-600"></span>Kegiatan</span><span class="font-bold">38%</span></div><div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-400"></span>Konsumsi</span><span class="font-bold">27%</span></div><div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-300"></span>Perlengkapan</span><span class="font-bold">17%</span></div><div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-200"></span>Lainnya</span><span class="font-bold">18%</span></div></div></section>
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+            <h3 class="text-base font-extrabold text-slate-900">Arus kas per bulan</h3>
+            <p class="mb-6 text-xs text-slate-500">Pemasukan dan pengeluaran pada rentang periode terpilih, berdasarkan tanggal transaksi.</p>
+            @include('laporan.arus-kas')
+        </section>
+        @include('keuangan.alokasi-pengeluaran', ['allocationHeading' => 'Alokasi pengeluaran'])
     </div>
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 p-6"><h3 class="text-base font-extrabold text-slate-900">Daftar transaksi kas</h3><p class="mt-1 text-xs text-slate-500">Transaksi sah pada periode terpilih; tagihan dan pengajuan yang belum disetujui bukan pemasukan kas.</p></div>
+        @include('keuangan.tabel-kas')
+        {{ $transactions->links('admin.anggota.pagination') }}
+    </section>
 </main>
 @endsection
-
-@push('scripts')
-<script>
-(() => {
-    // Angka periode hanya data contoh lokal, bukan hasil query database.
-    const data={mar:{awal:16655000,masuk:4275000,keluar:2180000,akhir:18750000},feb:{awal:15350000,masuk:2850000,keluar:1545000,akhir:16655000},jan:{awal:14200000,masuk:2400000,keluar:1250000,akhir:15350000}};
-    const format=n=>`Rp ${new Intl.NumberFormat('id-ID').format(n)}`;
-    const periodButton=document.getElementById('periodeLaporan'),periodMenu=document.getElementById('periodeLaporanMenu');
-    periodButton.addEventListener('click',()=>{const willOpen=periodMenu.classList.contains('hidden');periodMenu.classList.toggle('hidden',!willOpen);periodButton.setAttribute('aria-expanded',String(willOpen));});
-    document.querySelectorAll('[data-periode]').forEach(option=>option.addEventListener('click',()=>{const d=data[option.dataset.periode];Object.entries(d).forEach(([key,val])=>{const el=document.querySelector(`[data-stat="${key}"]`);if(el)el.textContent=format(val);});document.querySelector('[data-stat="donut"]').textContent=`Rp ${(d.keluar/1000000).toLocaleString('id-ID',{maximumFractionDigits:2})} jt`;document.getElementById('periodeLaporanLabel').textContent=option.dataset.label;periodMenu.classList.add('hidden');periodButton.setAttribute('aria-expanded','false');}));
-    document.getElementById('unduhLaporan').addEventListener('click',()=>{const p=document.getElementById('pesanLaporan');p.textContent='Unduh PDF belum terhubung ke backend. Tidak ada file yang dibuat pada mode preview.';p.classList.remove('hidden');});
-})();
-</script>
-@endpush

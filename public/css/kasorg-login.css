@@ -1,0 +1,22 @@
+/* Login only: Refan's composition on Bootstrap 5, without changing guest errors
+ * or any portal styles. Auth form fields and submit behavior stay in Blade.
+ */
+.kasorg-bootstrap.ko-login-page .ko-login-card { border-color:#f1f5f9 !important; }
+.kasorg-bootstrap.ko-login-page .ko-leading-tight { line-height:1.25 !important; }
+.kasorg-bootstrap.ko-login-page .ko-leading-snug { line-height:1.375 !important; }
+.kasorg-bootstrap.ko-login-page .ko-leading-relaxed { line-height:1.625 !important; }
+.kasorg-bootstrap.ko-login-page .ko-text-xl { line-height:1.75rem !important; }
+@media(min-width:640px) {
+    .kasorg-bootstrap.ko-login-page .ko-sm-text-3xl { line-height:2.25rem !important; }
+}
+.kasorg-bootstrap.ko-login-page form > .btn.shadow {
+    box-shadow:0 4px 6px -1px #2345784d, 0 2px 4px -2px #2345784d !important;
+}
+.kasorg-bootstrap.ko-login-page .alert {
+    --bs-alert-padding-x:0;
+    --bs-alert-padding-y:0;
+    --bs-alert-bg:transparent;
+    --bs-alert-border-width:0;
+    border:0;
+    margin-bottom:0;
+}

@@ -1,0 +1,55 @@
+/* Refan's pre-migration member layout, scoped to this page only.
+ * Bootstrap remains responsible for grid, forms, table, pagination and modal.
+ */
+.kasorg-bootstrap.ko-members-page .ko-leading-tight { line-height:1.25 !important; }
+.kasorg-bootstrap.ko-members-page .ko-portal-note { line-height:1rem; }
+.kasorg-bootstrap.ko-members-page .ko-topbar { gap:0; }
+.kasorg-bootstrap.ko-members-page .ko-topbar > div:last-child { flex-shrink:0; }
+.kasorg-bootstrap.ko-members-page .ko-members-stats .card {
+    flex-direction:row; padding:20px; border-radius:16px;
+}
+.kasorg-bootstrap.ko-members-page .shadow-sm { box-shadow:0 1px 2px #0000000d !important; }
+.kasorg-bootstrap.ko-members-page main.ko-members-content > section.ko-members-stats.row {
+    margin-top:calc(2rem - var(--bs-gutter-y)) !important;
+}
+.kasorg-bootstrap.ko-members-page .ko-members-search { flex-shrink:0; }
+.kasorg-bootstrap.ko-members-page #tambah-anggota { box-shadow:0 4px 6px -1px #23457833,0 2px 4px -2px #23457833 !important; }
+.kasorg-bootstrap.ko-members-page .ko-members-controls .form-select {
+    width:auto; flex:0 0 auto; min-width:0;
+    padding-right:2rem !important; background-position:right .5rem center;
+    background-size:12px 9px; line-height:17px !important;
+}
+.kasorg-bootstrap.ko-members-page .ko-members-controls { flex-shrink:0; }
+.kasorg-bootstrap.ko-members-page #cari-anggota:focus { background-color:white !important; }
+.kasorg-bootstrap.ko-members-page .ko-members-actions { white-space:nowrap; }
+.kasorg-bootstrap.ko-members-page .ko-members-actions .btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:0; border:0; background:transparent; line-height:1;
+}
+.kasorg-bootstrap.ko-members-page .ko-members-actions form { display:inline-flex; }
+.kasorg-bootstrap.ko-members-page .ko-members-actions a { white-space:nowrap; }
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel .ko-table { vertical-align:middle; }
+.kasorg-bootstrap.ko-members-page .ko-table > tbody > tr > td { vertical-align:middle; border-bottom:0; }
+.kasorg-bootstrap.ko-members-page .ko-table > tbody > tr + tr { border-top:1px solid #f1f5f9; }
+.kasorg-bootstrap.ko-members-page .ko-table thead tr { line-height:1rem !important; }
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel .pagination { gap:4px; }
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel nav { color:#64748b; }
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel .page-link {
+    font-size:12px; line-height:16px; padding:6px 12px;
+    border-radius:8px !important; margin-left:0 !important;
+}
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel .page-item.active .page-link { font-weight:700; }
+.kasorg-bootstrap.ko-members-page .ko-members-table-panel .page-item.disabled .page-link {
+    background:white; color:#94a3b8; border-color:#e2e8f0;
+}
+@media(min-width:640px) {
+    .kasorg-bootstrap.ko-members-page .ko-members-toolbar { flex-wrap:wrap; }
+    .kasorg-bootstrap.ko-members-page .ko-members-table-panel .ko-table thead tr { line-height:20px !important; }
+}
+@media(min-width:1200px) {
+    .kasorg-bootstrap.ko-members-page .ko-members-toolbar { flex-wrap:nowrap; }
+}
+@media(max-width:639px) {
+    .kasorg-bootstrap.ko-members-page .ko-topbar { padding:1rem 1.5rem; }
+    .kasorg-bootstrap.ko-members-page .ko-topbar h1 { font-size:20px !important; }
+}
